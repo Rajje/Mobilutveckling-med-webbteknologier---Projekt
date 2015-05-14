@@ -14,22 +14,56 @@
 	</head>
 	<body>
 		<div id="application">
-			<div class="view" id="loginView">
+
+			<div data-role="page" class="view" id="loginView">
 				<a class="ui-btn ui-btn-inline ui-btn-b">Log In</a>
+
+				<!-- TEST -->				
+				<a href="#loginView" class="ui-btn-b">HOME</a>
+				<a href="#mapView" class="ui-btn-b">MAP</a>
+				<a href="#chatView" class="ui-btn-b">CHAT</a>
+
 			</div>
-			<div class="view" id="homeView">
-				<div id="header"></div>
-				<div id="footer"></div>
+
+			<div data-role="page" class="view" id="mapView">
+				<div data-role="header">
+					<h1>Map</h1>
+				</div>
+				<div data-role="main">
+					<div id="theMap"></div>
+				</div>
+
+				<div data-role="footer">
+					<h1>Menu</h1>
+					<div data-role="navbar">
+						<ul>
+							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>
+							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
+						</ul>
+					</div>
+				</div>
 			</div>
-			<div class="view" id="mapView">
-				<div id="header"></div>
-				<div id="theMap"></div>
-				<div id="footer"></div>
-			</div>
-			<div class="view" id="chatView">
-				<div id="header"></div>
-				<div id="chatWindow"></div>
-				<div id="footer"></div>
+
+			<div data-role="page" class="view" id="chatView">
+				<div data-role="header" id="header">
+					<h1>Chat</h1>
+				</div>
+				<div data-role="main"> 
+					<input type="text" data-clear-btn="true" placeholder="Put text here"></input>
+					<button class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini">Submit</button>
+					<div class="chatWindow"></div>
+				</div>
+				<div data-role="footer">
+					<h1>Menu</h1>
+					<div data-role="navbar">
+						<ul>
+							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>
+							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>
