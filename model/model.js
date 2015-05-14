@@ -68,6 +68,11 @@ Model = function() {
 		console.log(data);
 	}
 	
+	this.getUserInfo = function() {
+		console.log("hej");
+		console.log(this.getHttp("https://api.instagram.com/v1/users/{self}}/?access_token="+ this.accessToken));
+	}
+	
 	//Function that init PUBNUB chat
 	this.initChat = function(){
 		//var randomID = PUBNUB.uuid();

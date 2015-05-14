@@ -8,10 +8,11 @@ HomeController = function(model, mainController, view) {
 			model.getNearbyImages();
 		}
 	}
+	
 	model.subscribe(this);
-
+	
 	model.getAccessTokenFromUrl();
-
+	model.getUserInfo();
 	
 	model.test();
 }
