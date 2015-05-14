@@ -19,7 +19,7 @@ Model = function() {
 		}
 	}
 	
-	//CHAT TODO
+	//Function that init PUBNUB chat
 	this.initChat = function(){
 		var randomID = PUBNUB.uuid();
 		chatChannel = PUBNUB.init({
@@ -30,6 +30,7 @@ Model = function() {
 		var alias; //TODO get the alias of instagram user name
 	}
 	
+	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(roomName, chatWindow){
 		chatChannel.subscribe({
 		      channel: roomName,
@@ -42,19 +43,19 @@ Model = function() {
 		currentRoom = roomName;
 	}
 	
-	this.numberInChat = function(){
-	}
-	
+	//Function for sending message in chat
 	this.sendMessage = function(msg) {
 		chatChannel.publish({channel: currentRoom, message : msg});
 	}
 	
+	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
 		PUBNUB.unsubscribe({
 			channel: currentRoom,
 		});
 	}
 	
+	//Function that get the location 
 	this.getLocation = function() {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(showPosition);
@@ -62,18 +63,21 @@ Model = function() {
 			alert("Geolocation is not supported by this browser.");
 		}
 	}
+	
+	//Function that get the latitude and longitude by current position
 	this.showPosition = function() {
 		function showPosition(position) {
 			convertLocation(position.coords.latitude, position.coords.longitude);	
 		}
 	}
 	
+	//Function that convert coordinates to an address
 	this.convertLocation = function(lat, lng) {
 		var latlng = new google.maps.LatLng(lat, lng);
 		geocoder.geocode({'latLng': latlng}, function(results, status) {
 		if (status == google.maps.GeocoderStatus.OK) {
 			if (results[1]) {
-				var msg = "+alias+"' enter the chatroom from "+results[0].formatted_address;
+				var msg = +alias+" enter the chatroom from "+results[0].formatted_address;
 				chatChannel.publish({channel: currentRoom, message : msg});
         } else {
           alert("No results found");
