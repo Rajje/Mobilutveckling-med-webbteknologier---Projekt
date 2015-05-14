@@ -4,6 +4,9 @@ var alias;
 Model = function() {
 	this.observers = [];
 	this.accessToken = "";
+	this.loggedIn = false;
+	this.nearbyMedia = [];
+	this.locationIDs = null;
 	var model = this;
 
 	this.test = function() {
@@ -16,15 +19,27 @@ Model = function() {
 	}
 
 	this.notifyObservers = function(msg) {
-		for (i in this.observers) {
+		for (var i in this.observers) {
 			this.observers[i].update(msg);
 		}
 	}
 
+	this.cameFromInstagramLogin = function() {
+		if (window.location.hash === "") {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	this.getAccessTokenFromUrl = function() {
-		this.accessToken = window.location.hash;
-		this.accessToken = this.accessToken.substring(this.accessToken.indexOf("=") + 1);
-		this.notifyObservers("gotAccessToken");
+		if(window.location.hash !== "") {
+			this.accessToken = window.location.hash;
+			this.accessToken = this.accessToken.substring(this.accessToken.indexOf("=") + 1);
+			this.loggedIn = true;
+			console.log("gotAccessToken");
+			this.notifyObservers("gotAccessToken");
+		}
 	}
 
 	this.getHttp = function(url, successFunction) {
@@ -50,18 +65,23 @@ Model = function() {
 		this.getHttp("https://api.instagram.com/v1/locations/search?lat=59.34045571&lng=18.03018451&access_token=" + this.accessToken, 
 			function(data) {
 				model.locationIDs = data;
+				console.log(data);
 				model.notifyObservers("gotLocationIDs");
-			});
+			}
+		);
 	}
 
-	this.getNearbyImages = function() {
-		var locationID = this.locationIDs.data[0].id;
-		this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken, this.successNearbyImages);
-	}
-
-	this.successNearbyImages = function(data) {
-		this.nearbyImages = data;
-		console.log(data);
+	this.getNearbyMedia = function() {
+		console.log(this.locationIDs.data.length);
+		for (var i = 0; i < this.locationIDs.data.length; i++) {
+			var locationID = this.locationIDs.data[i].id;
+			this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken,
+				function(data) {
+					model.nearbyMedia.push(data);
+					model.notifyObservers("gotNearbyMedia");
+				}
+			);
+		}
 	}
 	
 	//Function that init PUBNUB chat
@@ -120,15 +140,16 @@ Model = function() {
 	this.convertLocation = function(lat, lng) {
 		var latlng = new google.maps.LatLng(lat, lng);
 		geocoder.geocode({'latLng': latlng}, function(results, status) {
-		if (status == google.maps.GeocoderStatus.OK) {
-			if (results[1]) {
-				var msg = +alias+" enter the chatroom from "+results[0].formatted_address;
-				chatChannel.publish({channel: currentRoom, message : msg});
-        } else {
-          alert("No results found");
-        }
-      } else {
-        alert("Geocoder failed due to: " + status);
-      }
-    });
+			if (status == google.maps.GeocoderStatus.OK) {
+				if (results[1]) {
+					var msg = +alias+" enter the chatroom from "+results[0].formatted_address;
+					chatChannel.publish({channel: currentRoom, message : msg});
+		        } else {
+		          alert("No results found");
+		        }
+	        } else {
+	          alert("Geocoder failed due to: " + status);
+	        }
+	    });
+	}
 }
