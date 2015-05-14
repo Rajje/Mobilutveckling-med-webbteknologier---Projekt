@@ -10,41 +10,62 @@
 		<script src="model/model.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
 		<script src="libraries/jquery/jquery.mobile-1.4.5.min.js"></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlJBI99M94Y2HOf4ia7-TMmSQKdivI5pA"></script>
 		<script src="application.js"></script>
 		<link rel="stylesheet" href="libraries/jquery/jquery.mobile-1.4.5.min.css"></link>
 		<script src="url.js"></script>
 	</head>
 	<body>
 		<div id="application">
-			<div class="view" id="loginView">
-				<div id="header"></div>
-				<a class="ui-btn ui-btn-inline ui-btn-b" href="https://instagram.com/oauth/authorize/?client_id=5e9c2a8a30f747ddbbf5a8d2d7b28961&redirect_uri=http://xml.csc.kth.se/~arvidsat/DM2518/projekt/index.html&response_type=token">
-					Logga in
-				</a>
 
+			<div data-role="page" class="view" id="loginView">
+				<a class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini" href="https://instagram.com/oauth/authorize/?client_id=5e9c2a8a30f747ddbbf5a8d2d7b28961&redirect_uri=http://xml.csc.kth.se/~arvidsat/DM2518/projekt/index.html&response_type=token">Log In</a>
+
+				<!-- TEST -->				
+				<a href="#loginView" class="ui-btn-b">HOME</a>
+				<a href="#mapView" class="ui-btn-b">MAP</a>
+				<a href="#chatView" class="ui-btn-b">CHAT</a>
 
 			</div>
-			
-			<div class="view" id="homeView">
-				<div id="header"></div>
-				<div id="images"></div>
-				<div id="footer"></div>
-			</div>
-			<div class="view" id="mapView">
-				<div id="header"></div>
-				<div id="theMap"></div>
-				<div id="footer"></div>
-			</div>
-			<div class="view" id="chatView">
-				<div id="header"></div>
-				<div id="inputArea">
-					<input id="textInput" placeholder="Your text goes here"></input>
-					<button class ="btn btn-primary" id="sendButton">Send</button>
+
+			<div data-role="page" class="view" id="mapView">
+				<div data-role="header">
+					<h1>Map</h1>
 				</div>
-				<div id="chatWindow"></div>
-				<div id="footer"></div>
+				<div data-role="main">
+					<div id="theMap"></div>
+				</div>
+
+				<div data-role="footer">
+					<h1>Menu</h1>
+					<div data-role="navbar">
+						<ul>
+							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
+							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div data-role="page" class="view" id="chatView">
+				<div data-role="header" id="header">
+					<h1>Chat</h1>
+				</div>
+				<div data-role="main"> 
+					<input type="text" data-clear-btn="true" placeholder="Put a text here"></input>
+					<button class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini">Submit</button>
+					<div class="chatWindow"></div>
+				</div>
+				<div data-role="footer">
+					<h1>Menu</h1>
+					<div data-role="navbar">
+						<ul>
+							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>
+							<li><a href="#chatView" class="ui-btn ui-btn-active ui-state-persist ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>

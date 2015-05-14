@@ -1,4 +1,5 @@
 ChatController = function(model, mainController, view) {
+
 	this.printMessages = function() {
 		var messages = model.getMessages();
 
@@ -20,4 +21,8 @@ ChatController = function(model, mainController, view) {
 	});
 	model.subscribe(this);
 	model.test();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 8aa2dfe5bb7cf85b25c997b3ee22305a77681502
