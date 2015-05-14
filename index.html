@@ -16,7 +16,7 @@
 		<div id="application">
 
 			<div data-role="page" class="view" id="loginView">
-				<a class="ui-btn ui-btn-inline ui-btn-b">Log In</a>
+				<a class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini" href="https://instagram.com/oauth/authorize/?client_id=5e9c2a8a30f747ddbbf5a8d2d7b28961&redirect_uri=http://xml.csc.kth.se/~arvidsat/DM2518/projekt/index.html&response_type=token">Log In</a>
 
 				<!-- TEST -->				
 				<a href="#loginView" class="ui-btn-b">HOME</a>
@@ -37,7 +37,7 @@
 					<h1>Menu</h1>
 					<div data-role="navbar">
 						<ul>
-							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>
+							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
 							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
 							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
 						</ul>
@@ -50,7 +50,7 @@
 					<h1>Chat</h1>
 				</div>
 				<div data-role="main"> 
-					<input type="text" data-clear-btn="true" placeholder="Put text here"></input>
+					<input type="text" data-clear-btn="true" placeholder="Put a text here"></input>
 					<button class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini">Submit</button>
 					<div class="chatWindow"></div>
 				</div>
@@ -59,7 +59,7 @@
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>
-							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#chatView" class="ui-btn ui-btn-active ui-state-persist ui-icon-comment ui-btn-icon-left">Chat</a></li>
 							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
 						</ul>
 					</div>
