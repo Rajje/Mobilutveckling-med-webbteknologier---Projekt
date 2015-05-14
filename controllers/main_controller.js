@@ -1,5 +1,11 @@
 MainController = function(model) {
 	mainController = this;
+	this.theControllers = {
+		'loginView': new Login_controller(model, mainController, $('#loginView')), 
+		'homeView': new Home_controller(model, mainController, $('#homeView')), 
+		'mapView': new Map_controller(model, mainController, $('#mapView')), 
+		'chatView': new Chat_controller(model, mainController, $('#chatView'))
+	};
 
 	this.test = function() {
 		model.test();
@@ -12,4 +18,13 @@ MainController = function(model) {
 			HomeController(model, mainController, $("#homeView"));
 		}
 	});
+
+	this.showView = function(thePage) {
+		var views = $('.view');
+    	for (var i=0; i < views.length; i++) {
+    		views[i].hide();
+   		}
+    	$('#' + thePage).show();
+    	this.theControllers[thePage];
+	}
 }
