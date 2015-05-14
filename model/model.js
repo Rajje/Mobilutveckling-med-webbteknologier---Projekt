@@ -27,11 +27,19 @@ Model = function() {
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
 			uuid: randomID
 		});
-		
 		var alias; //TODO get the alias of instagram user name
 	}
 	
-	this.subscribeToChat = function(){
+	this.subscribeToChat = function(roomName, chatWindow){
+		chatChannel.subscribe({
+		      channel: roomName,
+		      message: function(m){chatWindow.value = m + '\n' + chatWindow.value},
+		      connect: function(){console.log("Connected"); subscribed = true},
+		      disconnect: function(){console.log("Disconnected")},
+		      reconnect: function(){console.log("Reconnected")},
+		      error: function(){console.log("Network Error")},
+	 	});		
+		currentRoom = roomName;
 	}
 	
 	this.numberInChat = function(){
@@ -40,4 +48,40 @@ Model = function() {
 	this.sendMessage = function(msg) {
 		chatChannel.publish({channel: currentRoom, message : msg});
 	}
+	
+	this.leaveChat = function(){
+		PUBNUB.unsubscribe({
+			channel: currentRoom,
+		});
+	}
+	
+	this.getLocation = function() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(showPosition);
+		} else { 
+			alert("Geolocation is not supported by this browser.");
+		}
+	}
+	this.showPosition = function() {
+		function showPosition(position) {
+			convertLocation(position.coords.latitude, position.coords.longitude);	
+		}
+	}
+	
+	this.convertLocation = function(lat, lng) {
+		var latlng = new google.maps.LatLng(lat, lng);
+		geocoder.geocode({'latLng': latlng}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			if (results[1]) {
+				var msg = "+alias+"' enter the chatroom from "+results[0].formatted_address;
+				chatChannel.publish({channel: currentRoom, message : msg});
+        } else {
+          alert("No results found");
+        }
+      } else {
+        alert("Geocoder failed due to: " + status);
+      }
+    });
+}
+	
 }
