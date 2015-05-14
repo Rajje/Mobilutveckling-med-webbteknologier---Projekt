@@ -9,7 +9,7 @@ MainController = function(model) {
 
 		this.loginController = new LoginController(model, mainController, $('#loginView'));
 		this.homeController = new HomeController(model, mainController, $('#homeView'));
-		this.chatView = new ChatController(model, mainController, $('#chatView'));
+		this.chatController = new ChatController(model, mainController, $('#chatView'));
 		if(!model.cameFromInstagramLogin()) {
 			mainController.showView('loginView');
 		} else {

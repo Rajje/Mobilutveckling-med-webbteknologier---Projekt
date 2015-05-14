@@ -56,7 +56,7 @@ Model = function() {
 				successFunction(data);
 			},
 			'error': function(xhr, status, error) {
-				this.getHttpError(error);
+				//this.getHttpError(error);
 			}
 		});
 	}
@@ -86,6 +86,11 @@ Model = function() {
 				}
 			);
 		}
+	}
+	
+	this.getUserInfo = function() {
+		console.log("user info");
+		console.log(this.getHttp("https://api.instagram.com/v1/users/{self}}/?access_token="+ this.accessToken));
 	}
 	
 	//Function that init PUBNUB chat
