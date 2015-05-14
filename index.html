@@ -6,6 +6,7 @@
 		<script src="controllers/main_controller.js"></script>
 		<script src="controllers/home_controller.js"></script>
 		<script src="controllers/login_controller.js"></script>
+		<script src="controllers/chat_controller.js"></script>
 		<script src="model/model.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
 		<script src="libraries/jquery/jquery.mobile-1.4.5.min.js"></script>
@@ -15,10 +16,18 @@
 	</head>
 	<body>
 		<div id="application">
-			<div class="view" id="loginView"><a class="ui-btn ui-btn-inline ui-btn-b" href="https://instagram.com/oauth/authorize/?client_id=5e9c2a8a30f747ddbbf5a8d2d7b28961&redirect_uri=http://xml.csc.kth.se/~arvidsat/DM2518/projekt/index.html&response_type=token">Logga in</a></div>
+			<div class="view" id="loginView">
+				<div id="header"></div>
+				<a class="ui-btn ui-btn-inline ui-btn-b" href="https://instagram.com/oauth/authorize/?client_id=5e9c2a8a30f747ddbbf5a8d2d7b28961&redirect_uri=http://xml.csc.kth.se/~arvidsat/DM2518/projekt/index.html&response_type=token">
+					Logga in
+				</a>
+
+
+			</div>
 			
 			<div class="view" id="homeView">
 				<div id="header"></div>
+				<div id="images"></div>
 				<div id="footer"></div>
 			</div>
 			<div class="view" id="mapView">

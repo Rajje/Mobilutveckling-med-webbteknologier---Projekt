@@ -1,30 +1,25 @@
 MainController = function(model) {
-	mainController = this;
-	this.theControllers = {
-		'loginView': new Login_controller(model, mainController, $('#loginView')), 
-		'homeView': new Home_controller(model, mainController, $('#homeView')), 
-		'mapView': new Map_controller(model, mainController, $('#mapView')), 
-		'chatView': new Chat_controller(model, mainController, $('#chatView'))
-	};
+	var mainController = this;
 
 	this.test = function() {
 		model.test();
 	}
 
 	$(document).ready(function() {
-		if(window.location.hash === "") {
-			LoginController(model, mainController, $("#loginView"));
+
+		this.loginController = new LoginController(model, mainController, $('#loginView'));
+		this.homeController = new HomeController(model, mainController, $('#homeView'));
+		this.chatController = new ChatController(model, mainController, $('#chatView'));
+		if(!model.cameFromInstagramLogin()) {
+			mainController.showView('loginView');
 		} else {
-			HomeController(model, mainController, $("#homeView"));
+			mainController.showView('homeView');
 		}
 	});
 
 	this.showView = function(thePage) {
-		var views = $('.view');
-    	for (var i=0; i < views.length; i++) {
-    		views[i].hide();
-   		}
+		$('.view').hide();
     	$('#' + thePage).show();
-    	this.theControllers[thePage];
+    	//this.theControllers[thePage];
 	}
 }

@@ -9,6 +9,9 @@ Model = function() {
 	this.currentRoom;
 	this.observers = [];
 	this.accessToken = "";
+	this.loggedIn = false;
+	this.nearbyMedia = [];
+	this.locationIDs = null;
 	var model = this;
 	this.test = function() {
 		console.log("test");
@@ -20,15 +23,27 @@ Model = function() {
 	}
 	
 	this.notifyObservers = function(msg) {
-		for (i in this.observers) {
+		for (var i in this.observers) {
 			this.observers[i].update(msg);
 		}
 	}
 
+	this.cameFromInstagramLogin = function() {
+		if (window.location.hash === "") {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	this.getAccessTokenFromUrl = function() {
-		this.accessToken = window.location.hash;
-		this.accessToken = this.accessToken.substring(this.accessToken.indexOf("=") + 1);
-		this.notifyObservers("gotAccessToken");
+		if(window.location.hash !== "") {
+			this.accessToken = window.location.hash;
+			this.accessToken = this.accessToken.substring(this.accessToken.indexOf("=") + 1);
+			this.loggedIn = true;
+			console.log("gotAccessToken");
+			this.notifyObservers("gotAccessToken");
+		}
 	}
 
 	this.getHttp = function(url, successFunction) {
@@ -41,7 +56,7 @@ Model = function() {
 				successFunction(data);
 			},
 			'error': function(xhr, status, error) {
-				this.getHttpError(error);
+				//this.getHttpError(error);
 			}
 		});
 	}
@@ -54,22 +69,27 @@ Model = function() {
 		this.getHttp("https://api.instagram.com/v1/locations/search?lat=59.34045571&lng=18.03018451&access_token=" + this.accessToken, 
 			function(data) {
 				model.locationIDs = data;
+				console.log(data);
 				model.notifyObservers("gotLocationIDs");
-			});
+			}
+		);
 	}
 
-	this.getNearbyImages = function() {
-		var locationID = this.locationIDs.data[0].id;
-		this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken, this.successNearbyImages);
-	}
-
-	this.successNearbyImages = function(data) {
-		this.nearbyImages = data;
-		console.log(data);
+	this.getNearbyMedia = function() {
+		console.log(this.locationIDs.data.length);
+		for (var i = 0; i < this.locationIDs.data.length; i++) {
+			var locationID = this.locationIDs.data[i].id;
+			this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken,
+				function(data) {
+					model.nearbyMedia.push(data);
+					model.notifyObservers("gotNearbyMedia");
+				}
+			);
+		}
 	}
 	
 	this.getUserInfo = function() {
-		console.log("hej");
+		console.log("user info");
 		console.log(this.getHttp("https://api.instagram.com/v1/users/{self}}/?access_token="+ this.accessToken));
 	}
 	
