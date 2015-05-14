@@ -56,7 +56,7 @@ Model = function() {
 				successFunction(data);
 			},
 			'error': function(xhr, status, error) {
-				//this.getHttpError(error);
+				model.getHttpError(error);
 			}
 		});
 	}
