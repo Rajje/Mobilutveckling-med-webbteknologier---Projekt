@@ -8,18 +8,7 @@ MainController = function(model) {
 	$(document).ready(function() {
 
 		this.loginController = new LoginController(model, mainController, $('#loginView'));
-		this.homeController = new HomeController(model, mainController, $('#homeView'));
+		this.homeController = new HomeController(model, mainController, $('#mapView'));
 		this.chatController = new ChatController(model, mainController, $('#chatView'));
-		if(!model.cameFromInstagramLogin()) {
-			mainController.showView('loginView');
-		} else {
-			mainController.showView('homeView');
-		}
 	});
-
-	this.showView = function(thePage) {
-		$('.view').hide();
-    	$('#' + thePage).show();
-    	//this.theControllers[thePage];
-	}
 }

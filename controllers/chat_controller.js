@@ -22,4 +22,3 @@ ChatController = function(model, mainController, view) {
 	model.subscribe(this);
 	model.test();
 }
-
