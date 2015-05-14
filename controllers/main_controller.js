@@ -12,7 +12,11 @@ MainController = function(model) {
 	}
 
 	$(document).ready(function() {
-		HomeController(model, mainController, $("#homeView"));
+		if(window.location.hash === "") {
+			LoginController(model, mainController, $("#loginView"));
+		} else {
+			HomeController(model, mainController, $("#homeView"));
+		}
 	});
 
 	this.showView = function(thePage) {
