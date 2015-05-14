@@ -1,8 +1,8 @@
 ChatController = function(model, mainController, view) {
 	this.printMessages = function(){
-		
 		var messages = model.getMessages();
-		for(int i = 0; i< messages.size(); i++){
+		
+		for(var i = 0; i< messages.size(); i++){
 			$("#chatWindow").append("<p>"+messages[i].alias+">> "+messages[i].chatMsg+"</p>");
 		}
 	}
@@ -20,5 +20,4 @@ ChatController = function(model, mainController, view) {
 	})
 	model.subscribe(this);
 	model.test();
-	
 }
