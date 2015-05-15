@@ -1,11 +1,10 @@
 ChatController = function(model, mainController, view) {
+	model.subscribe(this);
 
 	this.printMessages = function() {
-		var messages = model.getMessages();
+		var message = model.getMessages();
+		$("#chatWindow").append("<p>"+message.alias+">> "+message.chatMsg+"</p>");
 
-		for (var i = 0; i< messages.size(); i++) {
-			$("#chatWindow").append("<p>"+messages[i].alias+">> "+messages[i].chatMsg+"</p>");
-		}
 	}
 	
 	this.update = function(msg) {
@@ -15,10 +14,14 @@ ChatController = function(model, mainController, view) {
 		}
 	}
 	
-	$("#sendButton").click(function(event){
+	$("#chatButton").click(function(event){
+		model.initChat();
+		model.subscribeToChat();
+	});
+	
+	$("#sendMsg").click(function(event){
 		var msg = $("#textInput").val();
+		console.log("con: "+msg);
 		model.sendMessage(msg);
 	});
-	model.subscribe(this);
-	model.test();
 }

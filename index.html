@@ -10,6 +10,7 @@
 		<script src="model/model.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
 		<script src="libraries/jquery/jquery.mobile-1.4.5.min.js"></script>
+		<script src="http://cdn.pubnub.com/pubnub-3.7.1.min.js"></script>
 		<script src="application.js"></script>
 		<link rel="stylesheet" href="libraries/jquery/jquery.mobile-1.4.5.min.css"></link>
 		<script src="url.js"></script>
@@ -23,7 +24,7 @@
 				<!-- TEST -->				
 				<a href="#loginView" class="ui-btn-b">HOME</a>
 				<a href="#mapView" class="ui-btn-b">MAP</a>
-				<a href="#chatView" class="ui-btn-b">CHAT</a>
+				<a href="#chatView" id = "chatButton" class="ui-btn-b">CHAT</a>
 
 			</div>
 
@@ -41,7 +42,7 @@
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
-							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#chatView" id = "chatButton" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
 							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
 						</ul>
 					</div>
@@ -53,9 +54,9 @@
 					<h1>Chat</h1>
 				</div>
 				<div data-role="main"> 
-					<input type="text" data-clear-btn="true" placeholder="Put a text here"></input>
-					<button class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini">Submit</button>
-					<div class="chatWindow"></div>
+					<input type="text" id = "textInput" data-clear-btn="true" placeholder="Put a text here"></input>
+					<button class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini" id = "sendMsg">Submit</button>
+					<div id="chatWindow"></div>
 				</div>
 				<div data-role="footer">
 					<h1>Menu</h1>

@@ -6,6 +6,7 @@ HomeController = function(model, mainController, view) {
 		
 		if (msg === "gotAccessToken") {
 			model.getLocationIDs();
+			model.getUserInfo();
 		} else if (msg === "gotLocationIDs") {
 			model.getNearbyMedia();
 		} else if (msg === "gotNearbyMedia") {
@@ -23,6 +24,5 @@ HomeController = function(model, mainController, view) {
 	}
 	if (!model.loggedIn) {
 		model.getAccessTokenFromUrl();
-	}
-	
+	}	
 }
