@@ -1,5 +1,6 @@
 MapController = function(model, mainController, view) {
 	var _this = this;
+	var mapOverlays = [];
 
 	if (!model.loggedIn) {
 		model.getAccessTokenFromUrl();
@@ -18,25 +19,33 @@ MapController = function(model, mainController, view) {
 	this.populateNearbyMedia = function() {
 		var media = model.getLatestNearbyMedia();
 		if (media.data.length > 0) {
-			console.log(media.data);
 			for (var i in media.data) {
 				var image = media.data[i].images.thumbnail.url;
 				var latitude = media.data[i].location.latitude;
 				var longitude = media.data[i].location.longitude;
 				var position = new google.maps.LatLng(latitude, longitude);
+				var content = document.createElement('div');
+				content.class = "imageOverlay";
+				content.style.width = "50px";
+				content.style.height = "50px";
 
-				model.addMarker(this.map, position, image);
+				var img = document.createElement('img');
+				img.src = image;
+				img.class = "imageOverlayImage";
+				img.style.width = "100%";
+				img.style.height = "100%";
+				content.appendChild(img);
+
+
+				var mapOverlay = (new google.maps.InfoWindow({
+					"content": content,
+					"position": position
+				}));
+
+				mapOverlay.open(this.map);
+
+				mapOverlays.push(mapOverlay);
 			}
-			// this.imageContainerLeft += 200;
-			// var top = 200;
-			// var deg = 7;
-			// var output = '<div class="imgContainer" style="left: ' + this.imageContainerLeft + 'px; top: ' + top + 'px;">';
-			// for (var i = 0; i < media.data.length; i++) {
-			// 	output += '<img class="imgThumb" src="' + media.data[i].images.low_resolution.url + '" style="transform: rotate(' + deg + 'deg); -webkit-transform: rotate(' + deg + 'deg);"/>';
-			// 	deg += 7;
-			// }
-			// output += '</div>';
-			// $("#images").append(output);
 		}
 	}
 
