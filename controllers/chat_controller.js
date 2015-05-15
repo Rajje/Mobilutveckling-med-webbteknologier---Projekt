@@ -15,8 +15,8 @@ ChatController = function(model, mainController, view) {
 		var msg = "<p class='ui-block-b' >"+message.chatMsg+"</p>";
 		return name+msg;
 	}
-	
-	$("#chatButton").click(function(event){
+
+	$(document).on("pageshow", "#chatView", function() {
 		model.initChat();
 		model.subscribeToChat();
 	});
