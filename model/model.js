@@ -135,8 +135,23 @@ Model = function() {
 		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
 			function(data) {
 					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name, textColor);
-				}
-			);
+			});
+	}
+	
+	this.getAlias = function() {
+		return user.alias;
+	}
+	
+	this.getProfilePic = function() {
+		return user.profileImage;
+	}
+	
+	this.getName = function() {
+		return user.name;
+	}
+	
+	this.getColor = function() {
+		return this.textColor;
 	}
 	
 	this.randomColorGenerator = function() {
