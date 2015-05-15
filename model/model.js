@@ -1,12 +1,30 @@
+Message = function(chatMsg, alias, textColor, profileImage) {
+	this.chatMsg = chatMsg;
+	this.alias = alias;
+	this.textColor = textColor;
+	this.profileImage = profileImage;
+}
+
+User = function(alias, profileImage, name, textColor){
+	this.alias = alias;
+	this.profileImage = profileImage;
+	this.name = name;
+	this.textColor = textColor;
+}
+
 Model = function() {
-	this.messages = [];
-	this.alias; //TODO get the alias of instagram user name
-	this.currentRoom;
 	this.observers = [];
 	this.accessToken = "";
 	this.loggedIn = false;
+	this.loggedIn = false;
 	this.nearbyMedia = [];
 	this.locationIDs = null;
+
+	//For chat
+	this.user;
+	this.currentFilter = "";
+	this.newMessage;
+	this.chatChannel;
 	
 	var model = this;
 
@@ -93,14 +111,26 @@ Model = function() {
 	}
 	
 	this.getUserInfo = function() {
-		console.log("user info");
-		console.log(this.getHttp("https://api.instagram.com/v1/users/{self}}/?access_token="+ this.accessToken));
+		var textColor = this.randomColorGenerator();
+		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
+			function(data) {
+					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name, textColor);
+				}
+			);
+	}
+	
+	this.randomColorGenerator = function() {
+		var letters = '0123456789ABCDEF'.split('');
+		var color = '#';
+		for (var i = 0; i < 6; i++ ) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
 	}
 	
 	//Function that init PUBNUB chat
 	this.initChat = function(){
-		//var randomID = PUBNUB.uuid();
-		chatChannel = PUBNUB.init({
+		this.chatChannel = PUBNUB.init({
 			publish_key: 'pub-c-c9b9bd43-e594-4146-b78a-716088b91de8',
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
 			uuid: this.alias
@@ -108,34 +138,37 @@ Model = function() {
 	}
 	
 	this.getMessages = function() {
-		return this.messages;
+		return this.newMessage;
 	}
 	
 	//Function that subscribes to a specific chat channel
-	this.subscribeToChat = function(roomName, chatWindow){
-		chatChannel.subscribe({
-		      channel: roomName,
+	this.subscribeToChat = function(){
+		if(this.currentFilter == ""){
+				this.currentFilter = "59.34045571 18.03018451"; 	//REMOVE LATER 
+		}
+		
+		this.chatChannel.subscribe({
+		      channel: this.currentFilter,
 		      message: function(m){
-					this.messages.push(m);
-					this.notifyObservers("newMessage");
+					model.newMessage = m;
+					model.notifyObservers("newMessage");
 			  },
 		      connect: function(){console.log("Connected"); subscribed = true},
 		      disconnect: function(){console.log("Disconnected")},
 		      reconnect: function(){console.log("Reconnected")},
 		      error: function(){console.log("Network Error")},
 	 	});		
-		this.currentRoom = roomName;
 	}
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		chatChannel.publish({channel: this.currentRoom, message : new Message(chatMsg, this.alias)});
+		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, user.textColor, user.profileImage)});
 	}
 	
 	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
 		PUBNUB.unsubscribe({
-			channel: this.currentRoom,
+			channel: this.currentFilter,
 		});
 	}
 

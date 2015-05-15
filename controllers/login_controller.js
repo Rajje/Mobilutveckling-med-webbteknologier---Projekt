@@ -4,6 +4,10 @@ LoginController = function(model, mainController, view) {
 	$("#loginButtonContainer").append(output);
 
 	this.update = function(msg) {
-		//
+		if (msg === "gotAccessToken") {
+			model.getUserInfo();
+		}
 	}
+
+	model.subscribe(this);
 }
