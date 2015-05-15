@@ -2,6 +2,18 @@ body {
 	font-family: "Helvetica";
 }
 
+[data-role=page] {
+	height: 100% !important; 
+	position:absolute !important;
+}
+
+[data-role=footer] {
+	bottom:0;
+	position:absolute !important;
+	top: auto !important;
+	width:100%;
+}
+
 .imgContainer {
 	position: absolute;
 	width: 100px;
@@ -19,9 +31,39 @@ body {
 
 #mapContainer {
 	height: 500px;
-	width: 90%;
+	width: 100%;
 }
 
 #map {
 	height: 100%;
+}
+
+#filterBar .filterSelect {
+
+width: 30%; !important
+
+}
+
+#filterBar .filterSearch {
+
+width: 50%; !important
+
+}
+
+#filterBar .filterButton {
+
+width: 20%; !important
+
+}
+
+#chatBar .chatInput {
+
+width: 70%; !important
+
+}
+
+#chatBar .chatButton {
+
+width: 30%; !important
+
 }
