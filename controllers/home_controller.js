@@ -13,16 +13,26 @@ HomeController = function(model, mainController, view) {
 		}
 	}
 
+	this.imageContainerLeft = 40;
+
 	this.populateNearbyMedia = function() {
 		var media = model.nearbyMedia[model.nearbyMedia.length - 1];
-		var output = "";
-		for (var i = 0; i < media.data.length; i++) {
-			output += '<img src="' + media.data[i].images.low_resolution.url + '"/>';
+		if (media.data.length > 0) {
+			console.log(media.data.length);
+			this.imageContainerLeft += 200;
+			var top = 200;
+			var deg = 7;
+			var output = '<div class="imgContainer" style="left: ' + this.imageContainerLeft + 'px; top: ' + top + 'px;">';
+			for (var i = 0; i < media.data.length; i++) {
+				output += '<img class="imgThumb" src="' + media.data[i].images.low_resolution.url + '" style="transform: rotate(' + deg + 'deg); -webkit-transform: rotate(' + deg + 'deg);"/>';
+				deg += 7;
+			}
+			output += '</div>';
+			$("#images").append(output);
 		}
-		$("#images").append(output);
 	}
+
 	if (!model.loggedIn) {
 		model.getAccessTokenFromUrl();
 	}
-	
 }

@@ -12,6 +12,7 @@ Model = function() {
 	this.loggedIn = false;
 	this.nearbyMedia = [];
 	this.locationIDs = null;
+	
 	var model = this;
 	this.test = function() {
 		console.log("test");
