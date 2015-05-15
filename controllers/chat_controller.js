@@ -1,24 +1,31 @@
 ChatController = function(model, mainController, view) {
 
 	this.printMessages = function() {
-		var messages = model.getMessages();
-
-		for (var i = 0; i< messages.size(); i++) {
-			$("#chatWindow").append("<p>"+messages[i].alias+">> "+messages[i].chatMsg+"</p>");
-		}
+		var message = model.getMessages();
+		$("#messageGrid").append(this.styleMessage(message));
 	}
 	
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
-		if (msg == "newMessage") {
-			this.printMessages();
-		}
+		if (msg == "newMessage") this.printMessages();
 	}
 	
-	$("#sendButton").click(function(event){
+	this.styleMessage = function(message){
+		var name = "<p class='ui-block-a' style = 'width: 30%; !important; color:"+message.textColor+"'><b>"+message.alias+"</b></p>";
+		var msg = "<p class='ui-block-b' >"+message.chatMsg+"</p>";
+		return name+msg;
+	}
+
+	$(document).on("pageshow", "#chatView", function() {
+		model.initChat();
+		model.subscribeToChat();
+	});
+	
+	$("#sendMsg").click(function(event){
 		var msg = $("#textInput").val();
 		model.sendMessage(msg);
+		$("#textInput").val('');
 	});
+
 	model.subscribe(this);
-	model.test();
 }

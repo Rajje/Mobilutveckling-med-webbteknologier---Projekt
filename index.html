@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<link rel="stylesheet" href="libraries/jquery/jquery.mobile-1.4.5.min.css"/>
-		<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+		<title>ImageMap</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+		<meta name="mobile-web-app-capable" content = "yes"/>
+		<link rel="stylesheet" href="stylesheet.css"/>
+		<link rel="icon" href="icons/icon.png" />
+		<link rel="stylesheet" href="libraries/jquery/jquery.mobile-1.4.5.min.css"></link>
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlJBI99M94Y2HOf4ia7-TMmSQKdivI5pA"></script>
 		<script src="controllers/map_controller.js"></script>
 		<script src="controllers/login_controller.js"></script>
@@ -13,55 +16,76 @@
 		<script src="model/constants.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
 		<script src="libraries/jquery/jquery.mobile-1.4.5.min.js"></script>
+		<script src="http://cdn.pubnub.com/pubnub-3.7.1.min.js"></script>
 		<script src="application.js"></script>
-
-		
 		<script src="url.js"></script>
 	</head>
 	<body>
 		<div id="application">
 
-			<div data-role="page" class="view" id="loginView">
+			<div data-role="page" data-theme="b" class="view" id="loginView">
 				<div id="loginButtonContainer"></div>
 
 				<!-- TEST -->				
 				<a href="#loginView" class="ui-btn-b">HOME</a>
 				<a href="#mapView" class="ui-btn-b">MAP</a>
-				<a href="#chatView" class="ui-btn-b">CHAT</a>
+				<a href="#chatView" id="chatButton" class="ui-btn-b">CHAT</a>
 
 			</div>
 
-			<div data-role="page" class="view" id="mapView">
+			<div data-role="page" data-theme="b" class="view" id="mapView">
 				<div data-role="header">
 					<h1>Map</h1>
 				</div>
 				<div data-role="main">
+					<div class="ui-grid-b" id="filterBar">
+						<div class="ui-block-a filterSelect">
+
+						<select data-mini="true" data-inline="true">
+							<option value="#">Hashtags</option>
+							<option value="username">Username</option>
+						</select>
+						</div>
+							<div class="ui-block-b filterSearch">
+								<input type="search" data-clear-btn="true" data-inline="true" data-mini="true" placeholder="Search"></input>
+							</div>
+							<div class="ui-block-c filterButton">
+								<button class="ui-btn ui-mini ui-btn-inline ui-corner-all">Search</button>
+							</div>
+					</div>
+
 					<div id="mapContainer">
 						<div id="map"></div>
 					</div>
-					<div id="images"></div>
-				</div>
-
+					</div>
 				<div data-role="footer">
 					<h1>Menu</h1>
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
-							<li><a href="#chatView" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
+							<li><a href="#chatView" id = "chatButton" class="ui-btn ui-icon-comment ui-btn-icon-left">Chat</a></li>
 							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
 						</ul>
 					</div>
 				</div>
 			</div>
 
-			<div data-role="page" class="view" id="chatView">
+			<div data-role="page" data-theme="b" class="view" id="chatView">
 				<div data-role="header" id="header">
 					<h1>Chat</h1>
 				</div>
 				<div data-role="main"> 
-					<input type="text" data-clear-btn="true" placeholder="Put a text here"></input>
-					<button class="ui-btn ui-btn-inline ui-btn-b ui-corner-all ui-mini">Submit</button>
-					<div class="chatWindow"></div>
+					<div class="ui-grid-a" id="chatBar">
+						<div class="ui-block-a chatInput">
+							<input type="text" data-clear-btn="true" data-inline="true" data-mini="true" placeholder="Put a text here" id="textInput"></input>
+						</div>
+						<div class="ui-block-b chatButton">
+							<button class="ui-btn ui-mini ui-btn-inline ui-corner-all" id="sendMsg">Submit</button>
+						</div>
+					</div>
+					<div id="chatWindow">
+						<div class ='ui-grid-a' id= "messageGrid"></div>
+					</div>
 				</div>
 				<div data-role="footer">
 					<h1>Menu</h1>

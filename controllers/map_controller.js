@@ -8,7 +8,7 @@ MapController = function(model, mainController, view) {
 
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
-		
+
 		if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
 		}
@@ -61,7 +61,9 @@ MapController = function(model, mainController, view) {
 		this.map.setCenter(model.userLocation);
 		this.map.setZoom(18);
 
-		model.loadLocationIDs(model.userLocation);
+		// model.loadLocationIDs(model.userLocation);
+
+		model.loadNearbyMedia(model.userLocation);
 
 		//this.addMarkers();
 	}
