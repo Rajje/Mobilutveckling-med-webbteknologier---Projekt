@@ -1,8 +1,3 @@
-Message = function(chatMsg, alias) {
-	this.chatMsg = chatMsg;
-	this.alias = alias;
-}
-
 Model = function() {
 	this.messages = [];
 	this.alias; //TODO get the alias of instagram user name
@@ -13,6 +8,7 @@ Model = function() {
 	this.nearbyMedia = [];
 	this.locationIDs = null;
 	var model = this;
+
 	this.test = function() {
 		console.log("test");
 		this.notifyObservers("test");
@@ -132,6 +128,30 @@ Model = function() {
 	this.leaveChat = function(){
 		PUBNUB.unsubscribe({
 			channel: this.currentRoom,
+		});
+	}
+
+	this.getMap = function(latitude, longitude, zoom, view) {
+		// Tar emot lat, long, zoom och DOM-element. Skapar karta, returnerar kartan, infogar kartan i elementet. 
+		var mapOptions = {
+			center: {lat: latitude, lng: longitude},
+			zoom: zoom,
+			mapTypeId: google.maps.MapTypeId.google_earhtview,
+			disableDefaultUI: true
+		};
+
+		var map = new google.maps.Map(view, mapOptions);
+
+		return map;
+	}
+
+	this.addMarker = function(map, position, image) {
+		// Tar emot en karta, ett positionsobjekt och en bild. Lägger till bilden på den positionen i den kartan. 
+		new google.maps.Marker({
+				map: map, 
+				position: position,
+				draggable: true,
+				icon: image
 		});
 	}
 }
