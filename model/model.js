@@ -1,12 +1,15 @@
-Message = function(chatMsg, alias) {
+Message = function(chatMsg, alias, textColor, profileImage) {
 	this.chatMsg = chatMsg;
 	this.alias = alias;
+	this.textColor = textColor;
+	this.profileImage = profileImage;
 }
 
-User = function(alias, profileImage, name){
+User = function(alias, profileImage, name, textColor){
 	this.alias = alias;
 	this.profileImage = profileImage;
 	this.name = name;
+	this.textColor = textColor;
 }
 
 Model = function() {
@@ -102,12 +105,21 @@ Model = function() {
 	}
 	
 	this.getUserInfo = function() {
-		console.log("user info");
+		var textColor = this.randomColorGenerator();
 		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
 			function(data) {
-					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name);
+					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name, textColor);
 				}
 			);
+	}
+	
+	this.randomColorGenerator = function() {
+		var letters = '0123456789ABCDEF'.split('');
+		var color = '#';
+		for (var i = 0; i < 6; i++ ) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
 	}
 	
 	//Function that init PUBNUB chat
@@ -144,8 +156,7 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		console.log(chatMsg);
-		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias)});
+		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, user.textColor, user.profileImage)});
 	}
 	
 	//Function for unsubscribing from a chat channel

@@ -3,7 +3,7 @@ ChatController = function(model, mainController, view) {
 
 	this.printMessages = function() {
 		var message = model.getMessages();
-		$("#chatWindow").append("<p>"+message.alias+">> "+message.chatMsg+"</p>");
+		$("#messageGrid").append(this.styleMessage(message));
 
 	}
 	
@@ -14,6 +14,12 @@ ChatController = function(model, mainController, view) {
 		}
 	}
 	
+	this.styleMessage = function(message){
+		var name = "<p class='ui-block-a' style = 'width: 10%; !important; color:"+message.textColor+"'><b>"+message.alias+"</b></p>";
+		var msg = "<p class='ui-block-b' >"+message.chatMsg+"</p>";
+		return name+msg;
+	}
+	
 	$("#chatButton").click(function(event){
 		model.initChat();
 		model.subscribeToChat();
@@ -21,7 +27,7 @@ ChatController = function(model, mainController, view) {
 	
 	$("#sendMsg").click(function(event){
 		var msg = $("#textInput").val();
-		console.log("con: "+msg);
 		model.sendMessage(msg);
+		$("#textInput").val('');
 	});
 }
