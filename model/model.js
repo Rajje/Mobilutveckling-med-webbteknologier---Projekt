@@ -80,24 +80,24 @@ Model = function() {
 		console.log(error);
 	}
 
-	this.loadLocationIDs = function(position) {
+	this.loadLocationIDs = function(position, distance) {
 		var latitude = position.A;
 		var longitude = position.F;
-		this.getHttp("https://api.instagram.com/v1/locations/search?lat=" + latitude + "&lng=" + longitude + "&access_token=" + this.accessToken, 
+		if (!distance) var distance = 1000;
+		this.getHttp("https://api.instagram.com/v1/locations/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&access_token=" + this.accessToken, 
 			function(data) {
 				model.locationIDs = data;
-				console.log(data);
-				// model.notifyObservers("gotLocationIDs");
+				model.notifyObservers("gotLocationIDs");
 				model.loadNearbyMedia();
 			}
 		);
 	}
 
-	this.loadNearbyMedia = function() {
+	this.loadMediaFromLocations = function() {
 		console.log(this.locationIDs.data.length);
 		for (var i = 0; i < this.locationIDs.data.length; i++) {
 			var locationID = this.locationIDs.data[i].id;
-			this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken + "&distance=" + 5000,
+			this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken,
 				function(data) {
 					model.nearbyMedia.push(data);
 					model.notifyObservers("gotNearbyMedia");
@@ -106,10 +106,30 @@ Model = function() {
 		}
 	}
 
+	this.loadNearbyMedia = function(position, callNumber, maxTimestamp) {
+		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
+		var latitude = position.A;
+		var longitude = position.F;
+		var distance = 500;
+
+		var callNumber = callNumber ? callNumber : 0; // om callNumber ej är angivet, sätt callNumber till 0
+
+		if (callNumber <= 3) { // kör endast funktionen upp till ett visst körnummer
+			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
+				function(data) {
+					model.nearbyMedia.push(data); // spara bunten med hittade bilder
+					model.notifyObservers("gotNearbyMedia");
+					var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
+					model.loadNearbyMedia(position, callNumber + 1, oldestTimestamp); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+				}
+			);
+		}
+	}
+
 	this.getLatestNearbyMedia = function() {
 		return this.nearbyMedia[this.nearbyMedia.length - 1];
 	}
-	
+
 	this.getUserInfo = function() {
 		var textColor = this.randomColorGenerator();
 		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
@@ -188,11 +208,20 @@ Model = function() {
 
 	this.addMarker = function(map, position, image) {
 		// Tar emot en karta, ett positionsobjekt och en bild. Lägger till bilden på den positionen i den kartan. 
-		new google.maps.Marker({
+		if (image) {
+			new google.maps.Marker({
 				map: map, 
 				position: position,
 				draggable: true,
 				icon: image
-		});
+			});
+		} else {
+			new google.maps.Marker({
+				map: map, 
+				position: position,
+				draggable: true,
+			});
+		}
+		
 	}
 }

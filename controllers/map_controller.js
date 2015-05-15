@@ -7,7 +7,7 @@ MapController = function(model, mainController, view) {
 
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
-		
+
 		if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
 		}
@@ -18,7 +18,6 @@ MapController = function(model, mainController, view) {
 	this.populateNearbyMedia = function() {
 		var media = model.getLatestNearbyMedia();
 		if (media.data.length > 0) {
-			console.log(media.data);
 			for (var i in media.data) {
 				var image = media.data[i].images.thumbnail.url;
 				var latitude = media.data[i].location.latitude;
@@ -27,16 +26,6 @@ MapController = function(model, mainController, view) {
 
 				model.addMarker(this.map, position, image);
 			}
-			// this.imageContainerLeft += 200;
-			// var top = 200;
-			// var deg = 7;
-			// var output = '<div class="imgContainer" style="left: ' + this.imageContainerLeft + 'px; top: ' + top + 'px;">';
-			// for (var i = 0; i < media.data.length; i++) {
-			// 	output += '<img class="imgThumb" src="' + media.data[i].images.low_resolution.url + '" style="transform: rotate(' + deg + 'deg); -webkit-transform: rotate(' + deg + 'deg);"/>';
-			// 	deg += 7;
-			// }
-			// output += '</div>';
-			// $("#images").append(output);
 		}
 	}
 
@@ -52,7 +41,9 @@ MapController = function(model, mainController, view) {
 		this.map.setCenter(model.userLocation);
 		this.map.setZoom(18);
 
-		model.loadLocationIDs(model.userLocation);
+		// model.loadLocationIDs(model.userLocation);
+
+		model.loadNearbyMedia(model.userLocation);
 
 		//this.addMarkers();
 	}
