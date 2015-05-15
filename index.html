@@ -4,15 +4,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<link rel="stylesheet" href="libraries/jquery/jquery.mobile-1.4.5.min.css"/>
 		<link rel="stylesheet" type="text/css" href="stylesheet.css"/>
-		<script src="controllers/home_controller.js"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlJBI99M94Y2HOf4ia7-TMmSQKdivI5pA"></script>
+		<script src="controllers/map_controller.js"></script>
 		<script src="controllers/login_controller.js"></script>
 		<script src="controllers/chat_controller.js"></script>
 		<script src="controllers/main_controller.js"></script>
 		<script src="model/model.js"></script>
-		<script src="model/constans.js"></script>
+		<script src="model/constants.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
 		<script src="libraries/jquery/jquery.mobile-1.4.5.min.js"></script>
 		<script src="application.js"></script>
+
 		
 		<script src="url.js"></script>
 	</head>
@@ -34,7 +36,9 @@
 					<h1>Map</h1>
 				</div>
 				<div data-role="main">
-					<div id="theMap"></div>
+					<div id="mapContainer">
+						<div id="map"></div>
+					</div>
 					<div id="images"></div>
 				</div>
 

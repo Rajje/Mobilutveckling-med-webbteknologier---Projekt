@@ -62,27 +62,34 @@ Model = function() {
 		console.log(error);
 	}
 
-	this.getLocationIDs = function() {
-		this.getHttp("https://api.instagram.com/v1/locations/search?lat=59.34045571&lng=18.03018451&access_token=" + this.accessToken, 
+	this.loadLocationIDs = function(position) {
+		var latitude = position.A;
+		var longitude = position.F;
+		this.getHttp("https://api.instagram.com/v1/locations/search?lat=" + latitude + "&lng=" + longitude + "&access_token=" + this.accessToken, 
 			function(data) {
 				model.locationIDs = data;
 				console.log(data);
-				model.notifyObservers("gotLocationIDs");
+				// model.notifyObservers("gotLocationIDs");
+				model.loadNearbyMedia();
 			}
 		);
 	}
 
-	this.getNearbyMedia = function() {
+	this.loadNearbyMedia = function() {
 		console.log(this.locationIDs.data.length);
 		for (var i = 0; i < this.locationIDs.data.length; i++) {
 			var locationID = this.locationIDs.data[i].id;
-			this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken,
+			this.getHttp("https://api.instagram.com/v1/locations/" + locationID + "/media/recent?access_token=" + this.accessToken + "&distance=" + 5000,
 				function(data) {
 					model.nearbyMedia.push(data);
 					model.notifyObservers("gotNearbyMedia");
 				}
 			);
 		}
+	}
+
+	this.getLatestNearbyMedia = function() {
+		return this.nearbyMedia[this.nearbyMedia.length - 1];
 	}
 	
 	this.getUserInfo = function() {

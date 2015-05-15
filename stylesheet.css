@@ -16,3 +16,12 @@ body {
 	left: 0px;
 	border: solid 25px black;
 }
+
+#mapContainer {
+	height: 500px;
+	width: 90%;
+}
+
+#map {
+	height: 100%;
+}
