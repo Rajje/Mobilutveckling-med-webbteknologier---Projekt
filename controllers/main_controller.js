@@ -7,8 +7,8 @@ MainController = function(model) {
 
 	$(document).ready(function() {
 
-		this.loginController = new LoginController(model, mainController, $('#loginView'));
-		this.homeController = new HomeController(model, mainController, $('#mapView'));
-		this.chatController = new ChatController(model, mainController, $('#chatView'));
+		mainController.loginController = new LoginController(model, mainController, $('#loginView'));
+		mainController.homeController = new HomeController(model, mainController, $('#mapView'));
+		mainController.chatController = new ChatController(model, mainController, $('#chatView'));
 	});
 }
