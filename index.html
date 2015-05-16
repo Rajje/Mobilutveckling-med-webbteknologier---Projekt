@@ -12,6 +12,7 @@
 		<script src="controllers/login_controller.js"></script>
 		<script src="controllers/chat_controller.js"></script>
 		<script src="controllers/main_controller.js"></script>
+		<script src="controllers/popup_controller.js"></script>
 		<script src="model/model.js"></script>
 		<script src="model/constants.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
@@ -89,9 +90,7 @@
 						</div>
 					</div>
 				</div>
-				<div data-role="popup" id="userInfoPopup">
-					<div id = "userName"></div>
-				</div>
+				
 				<div data-role="footer">
 					<h1>Menu</h1>
 					<div data-role="navbar">
@@ -101,6 +100,10 @@
 							<li><a href="#loginView" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a></li>
 						</ul>
 					</div>
+				</div>
+				
+				<div data-role="popup" id="popUpView">
+					<div id = "userName"></div>
 				</div>
 			</div>
 		</div>

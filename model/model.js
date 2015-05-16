@@ -5,11 +5,10 @@ Message = function(chatMsg, alias, textColor, profileImage) {
 	this.profileImage = profileImage;
 }
 
-User = function(alias, profileImage, name, textColor){
+User = function(alias, profileImage, name){
 	this.alias = alias;
 	this.profileImage = profileImage;
 	this.name = name;
-	this.textColor = textColor;
 }
 
 Model = function() {
@@ -21,10 +20,11 @@ Model = function() {
 	this.locationIDs = null;
 
 	//For chat
-	this.user;
+	this.user = "";
 	this.currentFilter = "";
 	this.newMessage;
 	this.chatChannel;
+	this.color;
 	
 	var model = this;
 
@@ -129,29 +129,59 @@ Model = function() {
 	this.getLatestNearbyMedia = function() {
 		return this.nearbyMedia[this.nearbyMedia.length - 1];
 	}
+	
+	this.getColor = function() {
+		return this.color;
+	}
 
 	this.getUserInfo = function() {
-		var textColor = this.randomColorGenerator();
+		this.color = this.randomColorGenerator();
 		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
 			function(data) {
-					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name, textColor);
+					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name);
 			});
 	}
 	
+	this.getNewUserInfo = function(alias) {
+		var r = $.Deferred();
+		this.getHttp("https://api.instagram.com/v1/users/search?q="+alias+"&access_token=" + this.accessToken,
+			function(data){
+				var theUser; 
+				if(data.data.length > 1){
+					console.log("checking");
+					for(var i = 0; i < data.data.length; i++){
+						if(data.data[i].username == alias){
+							theUser = data.data[i];
+							break;
+						}
+					}
+				}
+				else{
+					theUser = data.data;
+				}
+					this.other = new User(theUser.username , theUser.profile_picture, theUser.full_name);
+					r.resolve();
+			});
+			
+		return r;
+	}
+	
+	this.getUser = function() {
+		return user;
+	}
+	
+	this.getOther = function() {
+		return other;
+	}
+	
 	this.getAlias = function() {
-		return user.alias;
+			return user.alias;
 	}
 	
-	this.getProfilePic = function() {
-		return user.profileImage;
-	}
-	
-	this.getName = function() {
-		return user.name;
-	}
-	
-	this.getColor = function() {
-		return this.textColor;
+	this.getNewUser = function(alias) {
+			this.getNewUserInfo(alias).done(function (){
+				model.notifyObservers("loadPopup");
+			});
 	}
 	
 	this.randomColorGenerator = function() {
@@ -181,7 +211,6 @@ Model = function() {
 		if(this.currentFilter == ""){
 				this.currentFilter = "59.34045571 18.03018451"; 	//REMOVE LATER 
 		}
-		
 		this.chatChannel.subscribe({
 		      channel: this.currentFilter,
 		      message: function(m){
@@ -197,7 +226,7 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, user.textColor, user.profileImage)});
+		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
 	}
 	
 	//Function for unsubscribing from a chat channel
