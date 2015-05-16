@@ -16,10 +16,10 @@ ChatController = function(model, mainController, view) {
 		return name+msg;
 	}
 
-	$(document).on("pageshow", "#chatView", function() {
+	/**$(document).on("pageshow", "#chatView", function() {
 		model.initChat();
 		model.subscribeToChat();
-	});
+	});**/
 	
 	$("#sendMsg").click(function(event){
 		var msg = $("#textInput").val();

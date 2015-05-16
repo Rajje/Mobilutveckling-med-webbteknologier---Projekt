@@ -195,10 +195,11 @@ Model = function() {
 	
 	//Function that init PUBNUB chat
 	this.initChat = function(){
+		var randomID = PUBNUB.uuid();
 		this.chatChannel = PUBNUB.init({
 			publish_key: 'pub-c-c9b9bd43-e594-4146-b78a-716088b91de8',
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
-			uuid: this.alias
+			uuid: randomID
 		});
 	}
 	
