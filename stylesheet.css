@@ -42,7 +42,7 @@ body {
 }
 
 #mapContainer {
-	height: 200px;
+	height: 300px;
 	width: 100%;
 }
 
@@ -57,4 +57,9 @@ body {
 #chatSubmit {
 	width: 25% !important;
 	margin-top: 0.5% !important
+}
+
+
+#searchButton {
+	float: right;
 }

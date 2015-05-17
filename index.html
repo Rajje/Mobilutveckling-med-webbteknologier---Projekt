@@ -18,6 +18,7 @@
 		<script src="controllers/popup_controller.js"></script>
 		<script src="model/model.js"></script>
 		<script src="model/constants.js"></script>
+		<script src="model/classes.js"></script>
 		<script src="libraries/jquery-2.1.4.min.js"></script>
 		<script src="libraries/jquery/jquery.mobile-1.4.5.min.js"></script>
 		<script src="http://cdn.pubnub.com/pubnub-3.7.1.min.js"></script>
@@ -40,18 +41,20 @@
 					<h1>Map</h1>
 				</div> -->
 				<div data-role="main">
-					<input type="search" data-inline="true" data-mini="true" placeholder="Search"></input>
-					<div class="ui-grid-a">
-						<div class="ui-block-a">
-								<select data-mini="true" data-inline="true">
-									<option value="#">Hashtags</option>
-									<option value="username">Username</option>
-								</select>
+					<form id="searchForm">
+						<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>
+						<div class="ui-grid-a">
+							<div class="ui-block-a">
+									<select name="category" data-mini="true" data-inline="true">
+										<option value="hashtags">Hashtags</option>
+										<option value="users">User</option>
+									</select>
+							</div>
+							<div class="ui-block-b">
+								<button class="ui-btn ui-mini ui-btn-inline ui-corner-all" type="submit" id="searchButton">Search</button>
+							</div>
 						</div>
-						<div class="ui-block-b">
-							<button style="float:right;" class="ui-btn ui-mini ui-btn-inline ui-corner-all">Search</button>
-						</div>
-					</div>
+					</form>
 
 
 					<div id="mapContainer">

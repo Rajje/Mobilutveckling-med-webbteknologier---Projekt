@@ -1,16 +1,3 @@
-Message = function(chatMsg, alias, textColor, profileImage) {
-	this.chatMsg = chatMsg;
-	this.alias = alias;
-	this.textColor = textColor;
-	this.profileImage = profileImage;
-}
-
-User = function(alias, profileImage, name){
-	this.alias = alias;
-	this.profileImage = profileImage;
-	this.name = name;
-}
-
 Model = function() {
 	this.observers = [];
 	this.accessToken = "";
@@ -18,6 +5,7 @@ Model = function() {
 	this.loggedIn = false;
 	this.nearbyMedia = [];
 	this.locationIDs = null;
+	this.nearbyMedia = [];
 
 	//For chat
 	this.user = "";
@@ -106,24 +94,73 @@ Model = function() {
 		}
 	}
 
-	this.loadNearbyMedia = function(position, callNumber, maxTimestamp) {
+	this.numberOfNearbyMedia = function() {
+		var length = 0;
+
+		for (i in model.nearbyMedia) {
+			length += model.nearbyMedia[i].data.length;
+		}
+
+		return length;
+	}
+
+	this.filterMedia = function(data, category, searchString) {
+		var filteredData = {
+			data: [], 
+			meta: data.meta
+		};
+
+		if (category == "hashtags") {
+			for (var i in data.data) {
+				var tagFound = false;
+
+				for (var j in data.data[i].tags) {
+					if (data.data[i].tags[j].toLowerCase() == searchString.toLowerCase()) tagFound = true;
+				}
+
+				if (tagFound) filteredData.data.push(data.data[i]); // om taggen finns i detta objekt, spara objektet i filteredData
+			}
+		} else if (category == "users") {
+			for (var i in data.data) {
+				var userData = data.data[i].user;
+				if (userData.full_name.toLowerCase() == searchString.toLowerCase() || userData.id.toLowerCase() == searchString.toLowerCase() || userData.username.toLowerCase() == searchString.toLowerCase()) {
+					filteredData.data.push(data.data[i]);
+				}
+			}
+		}
+
+		return filteredData;
+	}
+
+	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {
 		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
 		var latitude = position.A;
 		var longitude = position.F;
 		var distance = 500;
+		var count = count ? count : 0;
 
-		var callNumber = callNumber ? callNumber : 0; // om callNumber ej är angivet, sätt callNumber till 0
+		this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
+			function(data) {
+				var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
 
-		if (callNumber <= 3) { // kör endast funktionen upp till ett visst körnummer
-			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
-				function(data) {
+				if ((data.data.length > 0) && searchString) data = model.filterMedia(data, category, searchString);
+				if (data.data.length > 0) {
 					model.nearbyMedia.push(data); // spara bunten med hittade bilder
 					model.notifyObservers("gotNearbyMedia");
-					var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
-					model.loadNearbyMedia(position, callNumber + 1, oldestTimestamp); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
 				}
-			);
-		}
+
+				count += 1;
+
+				if ((model.numberOfNearbyMedia() < 20) && (count <= 5)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
+					model.loadNearbyMedia(position, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+				}
+			}
+		);
+	}
+
+	this.clearNearbyMedia = function() {
+		this.nearbyMedia = [];
+		this.notifyObservers("nearbyMediaCleared");
 	}
 
 	this.getLatestNearbyMedia = function() {
