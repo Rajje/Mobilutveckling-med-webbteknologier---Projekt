@@ -4,7 +4,9 @@
 	<head>
 		<title>ImageMap</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-		<meta name="mobile-web-app-capable" content = "yes"/>
+		<meta name="mobile-web-app-capable" content="yes"/>
+		<meta name="apple-mobile-web-app-capable" content="yes"/>
+		<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 		<link rel="icon" href="icons/icon.png" />
 		<link rel="stylesheet" href="libraries/jquery/jquery.mobile-1.4.5.min.css"></link>
 		<link rel="stylesheet" href="stylesheet.css"/>
@@ -28,17 +30,15 @@
 			<div data-role="page" data-theme="b" class="view" id="loginView">
 				<div id="loginButtonContainer"></div>
 
-				<!-- TEST -->				
-				<a href="#loginView" class="ui-btn-b">HOME</a>
+<!-- 				<a href="#loginView" class="ui-btn-b">HOME</a>
 				<a href="#mapView" class="ui-btn-b">MAP</a>
-				<a href="#chatView" id="chatButton" class="ui-btn-b">CHAT</a>
-
+				<a href="#chatView" id="chatButton" class="ui-btn-b">CHAT</a> -->
 			</div>
 
 			<div data-role="page" data-theme="b" class="view" id="mapView">
-				<div data-role="header">
+<!-- 				<div data-role="header">
 					<h1>Map</h1>
-				</div>
+				</div> -->
 				<div data-role="main">
 					<input type="search" data-inline="true" data-mini="true" placeholder="Search"></input>
 					<div class="ui-grid-a">
@@ -59,7 +59,7 @@
 					</div>
 					</div>
 				<div data-role="footer">
-					<h1>Menu</h1>
+					<!-- <h1>Menu</h1> -->
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
@@ -71,9 +71,9 @@
 			</div>
 
 			<div data-role="page" data-theme="b" class="view" id="chatView">
-				<div data-role="header" id="header">
+<!-- 				<div data-role="header" id="header">
 					<h1>Chat</h1>
-				</div>
+				</div> -->
 				<div data-role="main"> 
 					<div data-role="navbar">
 						<ul>
@@ -93,7 +93,7 @@
 				</div>
 				
 				<div data-role="footer">
-					<h1>Menu</h1>
+					<!-- <h1>Menu</h1> -->
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>

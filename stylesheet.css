@@ -2,24 +2,26 @@ body {
 	font-family: "Helvetica";
 }
 
-/*#application {
-
+#application {
 	position: fixed;
 	height: 100%;
-	width:100%;
-	margin:0;
-	padding:0;
-
-}*/
+	width: 100%;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
+}
 
 [data-role=page] {
 	height: 100% !important; 
+	width: 100%;
+	margin: 0;
 	position:absolute !important;
 }
 
 [data-role=footer] {
 	bottom:0;
-	position:absolute !important;
+	position: absolute !important;
 	top: auto !important;
 	width:100%;
 }
@@ -40,7 +42,7 @@ body {
 }
 
 #mapContainer {
-	height:500px;
+	height: 200px;
 	width: 100%;
 }
 
@@ -49,15 +51,10 @@ body {
 }
 
 #chatInput {
-
-width: 75% !important
-
-
+	width: 75% !important
 }
 
 #chatSubmit {
-
-width: 25% !important;
-margin-top: 0.5% !important
-
+	width: 25% !important;
+	margin-top: 0.5% !important
 }
