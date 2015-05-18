@@ -127,16 +127,18 @@
 		if (!_this.map) { // om inte kartan finns sedan tidigare
 			_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 			model.locateUser();
-
 			google.maps.event.addListener(_this.map, "dragend", function() {
 				_this.setNewPosition();
 			});
-
 			google.maps.event.addListener(_this.map, "zoom_changed", function() {
 				_this.setNewPosition();
 			});
 		}
-	});
+		$("#positionButton").click(function() {
+			model.locateUser();
+		});
+});
+
 
 	model.subscribe(this);
 }
