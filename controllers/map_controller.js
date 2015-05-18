@@ -103,8 +103,12 @@
 		if (!_this.map) {
 			_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 			model.locateUser();
+			$("#positionButton").click(function() {
+				model.locateUser();
+			});
 		}
 	});
+
 
 	model.subscribe(this);
 }
