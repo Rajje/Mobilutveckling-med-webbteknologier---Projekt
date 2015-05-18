@@ -10,10 +10,11 @@ Model = function() {
 
 	//For chat
 	this.user = "";
-	this.currentChannel = "";
+	this.currentChannel = "123";
 	this.newMessage;
 	this.chatChannel;
 	this.color;
+	this.loading = true;
 	var _this = this;
 	
 	var model = this;
@@ -33,6 +34,7 @@ Model = function() {
 		// Anropas när användarens position har fastställts. 
 		this.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 		this.notifyObservers("foundLocation");
+		console.log("foundLocation");
 		this.setChannel(this.userLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
 	}
 
@@ -159,22 +161,31 @@ Model = function() {
 	}
 	
 	this.setChannel = function(data, category, searchString) {
-		if(this.currentChannel != ""){
-			this.leaveChat();
+		if(this.currentChannel == "123" && this.loading == true){
+			model.notifyObservers("newChannel");
+			this.loading = false;
 		}
 		
-		var resolution = 2;
-		var lat = data.A;
-		var lang = data.F;
-		var position = "Position: "+this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+		else{
+			if(this.currentChannel != ""){
+				this.leaveChat();
+				console.log("leaving nr: "+this.currentChannel);
+			}
 		
-		if((category == "hashtags") && (searchString != "")){
+			var resolution = 2;
+			var lat = data.A;
+			var lang = data.F;
+			var position = "Position: "+this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+			
+			if((category == "hashtags") && (searchString != "")){
 				this.currentChannel = position + " #"+searchString;
 				model.notifyObservers("newChannel");
-		}
-		else{
+			}
+			
+			else{
 				this.currentChannel = position;
 				model.notifyObservers("newChannel");
+			}
 		}
 	}
 	
@@ -319,6 +330,8 @@ Model = function() {
 	
 	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(){
+		console.log("subscribed to "+this.currentChannel);
+		
 		this.chatChannel.subscribe({
 		      channel: this.currentChannel,
 		      message: function(m){

@@ -11,7 +11,7 @@ ChatController = function(model, mainController, view) {
 		if (msg == "newChannel"){
 			$("#messageGrid").html('');
 			$("#currentRoom").empty();
-			$("#currentRoom").append("<p>"+model.currentChannel+"</p>");
+			$("#currentRoom").append("Position: <p>"+model.currentChannel+"</p>");
 			model.subscribeToChat();
 		}
 	}

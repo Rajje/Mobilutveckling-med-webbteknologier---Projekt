@@ -7,6 +7,7 @@ LoginController = function(model, mainController, view) {
 		if (msg === "gotAccessToken") {
 			model.getUserInfo();
 			model.initChat();
+			model.setChannel();
 			window.location.href = "#mapView";
 		}
 	}
