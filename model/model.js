@@ -8,6 +8,7 @@ Model = function() {
 	this.nearbyMedia = [];
 	this.roundedLocation = null;
 	this.currentTag = "";
+	this.popupImage = {};
 
 	//For chat
 	this.user = "";
@@ -15,6 +16,7 @@ Model = function() {
 	this.newMessage;
 	this.chatChannel;
 	this.color;
+	var _this = this;
 	
 	var model = this;
 
@@ -162,19 +164,22 @@ Model = function() {
 	}
 	
 	this.setChannel = function(location, category, searchString) {
-		model.notifyObservers("newChannel");
 		this.leaveChat();
 
 		var position = location.A+ " "+ location.F;
+
+		if(this.currentChannel != ""){
+			this.leaveChat();
+		}
 		
-		if(category = "hashtags"){						
-				this.currentChannel = position +searchString;
+		if((category == "hashtags") && (searchString != "")){
+				this.currentChannel = position + " #"+searchString;
+				model.notifyObservers("newChannel");
 		}
 		else{
 				this.currentChannel = position;
+				model.notifyObservers("newChannel");
 		}
-		console.log("subscribed to :"+this.currentChannel);
-		this.subscribeToChat();
 	}
 	
 	this.geoHash = function(coord, resolution) {
@@ -236,6 +241,70 @@ Model = function() {
 		}
 	}
 
+	this.loadImage = function(mediaID, nI, nJ) {
+		console.log(nI + " "+  nJ);
+		this.setPopupImagePosition(nI, nJ);
+		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
+			function(data, nI, nJ) {
+				model.setPopupImage(data.data);
+				model.notifyObservers("loadImage");
+			}
+		);
+	}
+
+	this.setPopupImagePosition = function(nI, nJ) {
+		this.popupImage.nI = nI;
+		this.popupImage.nJ = nJ;
+	}
+
+	this.setPopupImage = function(data, nI, nJ) {
+		this.popupImage.id = data.id;
+		this.popupImage.url = data.images.standard_resolution.url;
+		this.popupImage.width = data.images.standard_resolution.width;
+		this.popupImage.height = data.images.standard_resolution.height;
+		this.popupImage.caption = data.caption;
+		this.popupImage.comments = data.comments;
+	}
+
+	this.getNextPopupImage = function() {
+		var nI = parseInt(this.popupImage.nI);
+		var nJ = parseInt(this.popupImage.nJ) + 1;
+		if (nJ >= this.nearbyMedia[nI].data.length) {
+			nJ = 0;
+			if (nI >= this.nearbyMedia.length - 1) {
+				nI = 0;
+			} else {
+				nI += 1;
+			}
+		}
+		console.log(nI + " "+  nJ);
+
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("nextPopupImage");
+	}
+
+	this.getPreviousPopupImage = function() {
+		//hitta bilden som nu visas i listan med all media
+		var nI = parseInt(this.popupImage.nI);
+		var nJ = parseInt(this.popupImage.nJ) - 1;
+
+		if (nJ < 0) {
+			if (nI <= 0) {
+				nI = this.nearbyMedia.length - 1;
+			} else {
+				nI -= 1;
+			}
+			nJ = this.nearbyMedia[nI].data.length - 1;
+		}
+		console.log(nI + " "+  nJ);
+
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("nextPopupImage");
+		
+	}
+
 	this.loadNearbyMedia = function(position, distance, category, searchString, maxTimestamp, count) {
 		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
 		
@@ -286,7 +355,6 @@ Model = function() {
 			function(data){
 				var theUser; 
 				if(data.data.length > 1){
-					console.log("checking");
 					for(var i = 0; i < data.data.length; i++){
 						if(data.data[i].username == alias){
 							theUser = data.data[i];
@@ -302,6 +370,16 @@ Model = function() {
 			});
 			
 		return r;
+	}
+	
+	
+	//Meddelande GO, press enter = skicka meddelande 
+	this.getChatHistory = function() {
+		this.chatChannel.history({
+			channel: this.currentChannel,
+			count: 10,
+			callback: function(m){_this.sendMessage(m[0])}			
+		});
 	}
 	
 	this.getUser = function() {
@@ -339,8 +417,6 @@ Model = function() {
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
 			uuid: randomID
 		});
-		
-		console.log("chat init");
 	}
 	
 	this.getMessages = function() {
@@ -349,33 +425,38 @@ Model = function() {
 	
 	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(){
-		if(this.currentChannel == ""){
-				//console.log(model.Location);
-				this.currentChannel = "123";
-		}
 		this.chatChannel.subscribe({
 		      channel: this.currentChannel,
 		      message: function(m){
 					model.newMessage = m;
 					model.notifyObservers("newMessage");
 			  },
-		      connect: function(){console.log("Connected"); subscribed = true},
+		      connect: function(){console.log("Connected"); model.getChatHistory(); subscribed = true},
 		      disconnect: function(){console.log("Disconnected")},
 		      reconnect: function(){console.log("Reconnected")},
 		      error: function(){console.log("Network Error")},
 	 	});		
+		
 	}
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		if(chatMsg != ""){
-			this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		
+		if(typeof chatMsg == 'object'){
+			for(var i = 0; i < chatMsg.length-1; i++){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg[i].chatMsg, chatMsg[i].alias, chatMsg[i].textColor, chatMsg[i].profileImage)});
+			}
+		}
+		else{
+			if(chatMsg != ""){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+			}
 		}
 	}
 	
 	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
-		PUBNUB.unsubscribe({
+		this.chatChannel.unsubscribe({
 			channel: this.currentChannel,
 		});
 	}
