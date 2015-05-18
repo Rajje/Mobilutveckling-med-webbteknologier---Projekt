@@ -1,6 +1,6 @@
 Logga ut-knapp
 Scrolla och grejer i chatten
-Filter högst upp alltid
+-Filter högst upp alltid
 Panorera kartan, få upp nya bilder
 Zooma kartan, få upp nya bilder
 Popup controller - innehåll försvinna när den stängs

@@ -24,11 +24,7 @@ MainController = function(model) {
 			</form>';
 
 		view.append(header);
-
-
 	}
-
-
 
 	$(document).ready(function() {
 		_this.addSearchHeader($('[data-role="header"]'));

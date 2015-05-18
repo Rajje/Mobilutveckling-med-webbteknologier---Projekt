@@ -11,9 +11,10 @@ MapController = function(model, mainController, view) {
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
 
-		if (msg === "gotAccessToken") {
-			console.log("mapView");
-			$.mobile.navigate("#mapView");
+		if (msg === "foundLocation") {
+			this.map.setCenter(model.userLocation);
+			this.map.setZoom(18);
+			model.loadNearbyMedia(model.userLocation);
 		} else if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
 		} else if (msg === "nearbyMediaCleared") {
@@ -66,32 +67,10 @@ MapController = function(model, mainController, view) {
 		}
 	}
 
-	this.foundLocation = function(position) {
-		// Anropas när användarens position har fastställts. 
-		model.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-		this.map.setCenter(model.userLocation);
-		this.map.setZoom(18);
-
-		model.loadNearbyMedia(model.userLocation);
-	}
-
-	this.noLocation = function(message) {
-		// Anropas när användarens position EJ kunde fastställas
-		console.log(message);
-	}
-
 	$(document).on("pageshow", view, function() {
 		// Infogar en Google-karta i elementet med id "map"
 		_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
-
-		navigator.geolocation.getCurrentPosition( // hämta användarens position
-			function(position) { // callback om position hittas
-				_this.foundLocation(position);
-			},
-			function(position) { // callback om position EJ hittas
-				_this.noLocation(position);
-			}
-		);
+		model.locateUser();
 	});
 
 	$("#searchForm").submit(function(event) {
