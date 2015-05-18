@@ -1,17 +1,3 @@
-Message = function(chatMsg, alias, textColor, profileImage) {
-	this.chatMsg = chatMsg;
-	this.alias = alias;
-	this.textColor = textColor;
-	this.profileImage = profileImage;
-}
-
-User = function(alias, profileImage, name, textColor){
-	this.alias = alias;
-	this.profileImage = profileImage;
-	this.name = name;
-	this.textColor = textColor;
-}
-
 Model = function() {
 	this.observers = [];
 	this.accessToken = "";
@@ -19,12 +5,14 @@ Model = function() {
 	this.loggedIn = false;
 	this.nearbyMedia = [];
 	this.locationIDs = null;
+	this.nearbyMedia = [];
 
 	//For chat
-	this.user;
+	this.user = "";
 	this.currentFilter = "";
 	this.newMessage;
 	this.chatChannel;
+	this.color;
 	
 	var model = this;
 
@@ -107,37 +95,131 @@ Model = function() {
 		}
 	}
 
-	this.loadNearbyMedia = function(position, callNumber, maxTimestamp) {
+	this.numberOfNearbyMedia = function() {
+		var length = 0;
+
+		for (i in model.nearbyMedia) {
+			length += model.nearbyMedia[i].data.length;
+		}
+
+		return length;
+	}
+
+	this.filterMedia = function(data, category, searchString) {
+		var filteredData = {
+			data: [], 
+			meta: data.meta
+		};
+
+		if (category == "hashtags") {
+			for (var i in data.data) {
+				var tagFound = false;
+
+				for (var j in data.data[i].tags) {
+					if (data.data[i].tags[j].toLowerCase() == searchString.toLowerCase()) tagFound = true;
+				}
+
+				if (tagFound) filteredData.data.push(data.data[i]); // om taggen finns i detta objekt, spara objektet i filteredData
+			}
+		} else if (category == "users") {
+			for (var i in data.data) {
+				var userData = data.data[i].user;
+				if (userData.full_name.toLowerCase() == searchString.toLowerCase() || userData.id.toLowerCase() == searchString.toLowerCase() || userData.username.toLowerCase() == searchString.toLowerCase()) {
+					filteredData.data.push(data.data[i]);
+				}
+			}
+		}
+
+		return filteredData;
+	}
+
+	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {
 		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
 		var latitude = position.A;
 		var longitude = position.F;
 		var distance = 500;
+		var count = count ? count : 0;
 
-		var callNumber = callNumber ? callNumber : 0; // om callNumber ej är angivet, sätt callNumber till 0
+		this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
+			function(data) {
+				var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
 
-		if (callNumber <= 3) { // kör endast funktionen upp till ett visst körnummer
-			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
-				function(data) {
+				if ((data.data.length > 0) && searchString) data = model.filterMedia(data, category, searchString);
+				if (data.data.length > 0) {
 					model.nearbyMedia.push(data); // spara bunten med hittade bilder
 					model.notifyObservers("gotNearbyMedia");
-					var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
-					model.loadNearbyMedia(position, callNumber + 1, oldestTimestamp); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
 				}
-			);
-		}
+
+				count += 1;
+
+				if ((model.numberOfNearbyMedia() < 20) && (count <= 5)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
+					model.loadNearbyMedia(position, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+				}
+			}
+		);
+	}
+
+	this.clearNearbyMedia = function() {
+		this.nearbyMedia = [];
+		this.notifyObservers("nearbyMediaCleared");
 	}
 
 	this.getLatestNearbyMedia = function() {
 		return this.nearbyMedia[this.nearbyMedia.length - 1];
 	}
+	
+	this.getColor = function() {
+		return this.color;
+	}
 
 	this.getUserInfo = function() {
-		var textColor = this.randomColorGenerator();
+		this.color = this.randomColorGenerator();
 		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
 			function(data) {
-					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name, textColor);
+					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name);
+			});
+	}
+	
+	this.getNewUserInfo = function(alias) {
+		var r = $.Deferred();
+		this.getHttp("https://api.instagram.com/v1/users/search?q="+alias+"&access_token=" + this.accessToken,
+			function(data){
+				var theUser; 
+				if(data.data.length > 1){
+					console.log("checking");
+					for(var i = 0; i < data.data.length; i++){
+						if(data.data[i].username == alias){
+							theUser = data.data[i];
+							break;
+						}
+					}
 				}
-			);
+				else{
+					theUser = data.data;
+				}
+					this.other = new User(theUser.username , theUser.profile_picture, theUser.full_name);
+					r.resolve();
+			});
+			
+		return r;
+	}
+	
+	this.getUser = function() {
+		return user;
+	}
+	
+	this.getOther = function() {
+		return other;
+	}
+	
+	this.getAlias = function() {
+			return user.alias;
+	}
+	
+	this.getNewUser = function(alias) {
+			this.getNewUserInfo(alias).done(function (){
+				model.notifyObservers("loadPopup");
+			});
 	}
 	
 	this.randomColorGenerator = function() {
@@ -151,10 +233,11 @@ Model = function() {
 	
 	//Function that init PUBNUB chat
 	this.initChat = function(){
+		var randomID = PUBNUB.uuid();
 		this.chatChannel = PUBNUB.init({
 			publish_key: 'pub-c-c9b9bd43-e594-4146-b78a-716088b91de8',
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
-			uuid: this.alias
+			uuid: randomID
 		});
 	}
 	
@@ -167,7 +250,6 @@ Model = function() {
 		if(this.currentFilter == ""){
 				this.currentFilter = "59.34045571 18.03018451"; 	//REMOVE LATER 
 		}
-		
 		this.chatChannel.subscribe({
 		      channel: this.currentFilter,
 		      message: function(m){
@@ -183,7 +265,7 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, user.textColor, user.profileImage)});
+		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
 	}
 	
 	//Function for unsubscribing from a chat channel

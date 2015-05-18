@@ -1,6 +1,7 @@
 MapController = function(model, mainController, view) {
 	var _this = this;
-	var mapOverlays = [];
+
+	this.mapOverlays = [];
 
 	if (!model.loggedIn) {
 		model.getAccessTokenFromUrl();
@@ -15,6 +16,9 @@ MapController = function(model, mainController, view) {
 			$.mobile.navigate("#mapView");
 		} else if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
+		} else if (msg === "nearbyMediaCleared") {
+			for (var i in this.mapOverlays) this.mapOverlays[i].close();
+			this.mapOverlays = [];
 		}
 	}
 
@@ -57,16 +61,10 @@ MapController = function(model, mainController, view) {
 					console.log("klickade");
 				});
 
-				mapOverlays.push(mapOverlay);
+				this.mapOverlays.push(mapOverlay);
 			}
 		}
 	}
-
-
-	// this.addMarkers = function() {
-	// 	// Lägger till bilder i kartan 
-	// 	model.addMarker(this.map, model.userLocation, "ulf.jpg"); // än så länge bara en testbild, på användarens position
-	// }
 
 	this.foundLocation = function(position) {
 		// Anropas när användarens position har fastställts. 
@@ -74,11 +72,7 @@ MapController = function(model, mainController, view) {
 		this.map.setCenter(model.userLocation);
 		this.map.setZoom(18);
 
-		// model.loadLocationIDs(model.userLocation);
-
 		model.loadNearbyMedia(model.userLocation);
-
-		//this.addMarkers();
 	}
 
 	this.noLocation = function(message) {
@@ -86,8 +80,6 @@ MapController = function(model, mainController, view) {
 		console.log(message);
 	}
 
-	
-	// google.maps.event.addDomListener(document.getElementById('mapView'), 'load', function() {
 	$(document).on("pageshow", "#mapView", function() {
 		console.log("map init");
 		// Infogar en Google-karta i elementet med id "map"
@@ -101,6 +93,13 @@ MapController = function(model, mainController, view) {
 				_this.noLocation(position);
 			}
 		);
+	});
+
+	$("#searchForm").submit(function(event) {
+		model.clearNearbyMedia();
+		model.loadNearbyMedia(model.userLocation, event.target.category.value, event.target.searchInput.value);
+
+		return false;
 	});
 
 	model.subscribe(this);

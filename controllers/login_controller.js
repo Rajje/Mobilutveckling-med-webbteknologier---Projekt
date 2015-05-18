@@ -6,6 +6,9 @@ LoginController = function(model, mainController, view) {
 	this.update = function(msg) {
 		if (msg === "gotAccessToken") {
 			model.getUserInfo();
+			model.initChat();
+			model.subscribeToChat();
+			window.location.href = "#mapView";
 		}
 	}
 
