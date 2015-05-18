@@ -31,16 +31,11 @@
 
 			<div data-role="page" data-theme="b" class="view" id="loginView">
 				<div id="loginButtonContainer"></div>
-
-<!-- 				<a href="#loginView" class="ui-btn-b">HOME</a>
-				<a href="#mapView" class="ui-btn-b">MAP</a>
-				<a href="#chatView" id="chatButton" class="ui-btn-b">CHAT</a> -->
 			</div>
 
 			<div data-role="page" data-theme="b" class="view" id="mapView">
-<!-- 				<div data-role="header">
-					<h1>Map</h1>
-				</div> -->
+				<div data-role="header">
+				</div>
 				<div data-role="main">
 					<form id="searchForm">
 						<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>
@@ -56,15 +51,14 @@
 							</div>
 						</div>
 					</form>
-
 					<div id="mapContainer">
 						<div data-role="popup" id="popupImage" class="imagepopup">
 						</div>
 						<div id="map"></div>
 					</div>
-					</div>
+				</div>
+
 				<div data-role="footer">
-					<!-- <h1>Menu</h1> -->
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
@@ -75,11 +69,15 @@
 				</div>
 			</div>
 
+
 			<div data-role="page" data-theme="b" class="view" id="chatView">
-<!-- 				<div data-role="header" id="header">
-					<h1>Chat</h1>
-				</div> -->
+				<div data-role="header"></div>
+
 				<div data-role="main"> 
+					<div id="chatWindow">
+						<div class ='ui-grid-a' id= "messageGrid">
+						</div>
+					</div>
 					<div data-role="navbar">
 						<ul>
 							<li id="chatInput">
@@ -90,15 +88,9 @@
 							</li>
 						</ul>
 					</div>
-
-					<div id="chatWindow">
-						<div class ='ui-grid-a' id= "messageGrid">
-						</div>
-					</div>
 				</div>
 				
 				<div data-role="footer">
-					<!-- <h1>Menu</h1> -->
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>

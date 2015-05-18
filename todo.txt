@@ -1,3 +1,12 @@
-Logga ut 
+Logga ut-knapp
 Scrolla och grejer i chatten
-Filter högst upp alltid
+-Filter högst upp alltid
+Panorera kartan, få upp nya bilder
+Zooma kartan, få upp nya bilder
+Popup controller - innehåll försvinna när den stängs
+Chathistorik
+Inloggninssida design
+Klicka på bilder, få upp större bild + info
+Få bort den lilla scrollen av sidan
+Automatisk resize av kartan beroende på fönsterstorlek
+Visa antal resultat

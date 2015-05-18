@@ -1,4 +1,4 @@
-MapController = function(model, mainController, view) {
+﻿MapController = function(model, mainController, view) {
 	var _this = this;
 
 	this.mapOverlays = [];
@@ -11,14 +11,19 @@ MapController = function(model, mainController, view) {
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
 
-		if (msg === "gotAccessToken") {
-			console.log("mapView");
-			$.mobile.navigate("#mapView");
+		if (msg === "foundLocation") {
+			this.map.setCenter(model.userLocation);
+			this.map.setZoom(18);
+			this.displaySearching();
+			model.loadNearbyMedia(model.userLocation);
 		} else if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
+			this.displayResultCount();
 		} else if (msg === "nearbyMediaCleared") {
 			for (var i in this.mapOverlays) this.mapOverlays[i].close();
 			this.mapOverlays = [];
+		} else if (msg === "loadNearbyMedia_done") {
+			this.displayResultCount();
 		}
 	}
 
@@ -77,40 +82,22 @@ MapController = function(model, mainController, view) {
 		}
 	}
 
-	this.foundLocation = function(position) {
-		// Anropas när användarens position har fastställts. 
-		model.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-		this.map.setCenter(model.userLocation);
-		this.map.setZoom(18);
-
-		model.loadNearbyMedia(model.userLocation);
+	this.displaySearching = function() {
+		view.find('#searchResults').html("Searching ...")
 	}
 
-	this.noLocation = function(message) {
-		// Anropas när användarens position EJ kunde fastställas
-		console.log(message);
+	this.displayResultCount = function() {
+		var resultCount = model.numberOfNearbyMedia();
+		var resultCountString = (resultCount == 1) ? (resultCount + " image found") : (resultCount + " images found");
+
+		view.find('#searchResults').html(resultCountString);
 	}
 
-	$(document).on("pageshow", "#mapView", function() {
-		console.log("map init");
-		// Infogar en Google-karta i elementet med id "map"
-		_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
-
-		navigator.geolocation.getCurrentPosition( // hämta användarens position
-			function(position) { // callback om position hittas
-				_this.foundLocation(position);
-			},
-			function(position) { // callback om position EJ hittas
-				_this.noLocation(position);
-			}
-		);
-	});
-
-	$("#searchForm").submit(function(event) {
-		model.clearNearbyMedia();
-		model.loadNearbyMedia(model.userLocation, event.target.category.value, event.target.searchInput.value);
-
-		return false;
+	$(document).on("pageshow", view, function() {
+		if (!_this.map) {
+			_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
+			model.locateUser();
+		}
 	});
 
 	model.subscribe(this);

@@ -10,7 +10,7 @@ Model = function() {
 
 	//For chat
 	this.user = "";
-	this.currentFilter = "";
+	this.currentChannel = "";
 	this.newMessage;
 	this.chatChannel;
 	this.color;
@@ -21,15 +21,38 @@ Model = function() {
 		console.log("test");
 		this.notifyObservers("test");
 	}
-	
-	this.subscribe = function(controller) {
-		this.observers.push(controller);
-	}
-	
+
 	this.notifyObservers = function(msg) {
 		for (var i in this.observers) {
 			this.observers[i].update(msg);
 		}
+	}
+
+	this.foundLocation = function(position) {
+		// Anropas när användarens position har fastställts. 
+		this.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		this.notifyObservers("foundLocation");
+		this.setChannel(this.userLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
+	}
+
+	this.noLocation = function(message) {
+		// Anropas när användarens position EJ kunde fastställas
+		console.log(message);
+	}
+
+	this.locateUser = function() {
+		navigator.geolocation.getCurrentPosition( // hämta användarens position
+			function(position) { // callback om position hittas
+				model.foundLocation(position);
+			},
+			function(position) { // callback om position EJ hittas
+				model.noLocation(position);
+			}
+		);
+	}
+	
+	this.subscribe = function(controller) {
+		this.observers.push(controller);
 	}
 
 	this.cameFromInstagramLogin = function() {
@@ -133,6 +156,30 @@ Model = function() {
 
 		return filteredData;
 	}
+	
+	this.setChannel = function(data, category, searchString) {
+		model.notifyObservers("newChannel");
+		this.leaveChat();
+		
+		var resolution = 2;
+		var lat = data.A;
+		var lang = data.F;
+		var position = this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+		
+		if(category = "hashtags"){						
+				this.currentChannel = position +searchString;
+		}
+		else{
+				this.currentChannel = position;
+		}
+		console.log("subscribed to :"+this.currentChannel);
+		this.subscribeToChat();
+	}
+	
+	this.geoHash = function(coord, resolution) {
+		var rez = Math.pow( 10, resolution || 0);
+		return Math.floor(coord * rez) / rez;
+	}
 
 	this.loadImage = function(mediaID) {
 		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
@@ -164,8 +211,10 @@ Model = function() {
 
 				count += 1;
 
-				if ((model.numberOfNearbyMedia() < 20) && (count <= 5)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
+				if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
 					model.loadNearbyMedia(position, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+				} else {
+					model.notifyObservers("loadNearbyMedia_done");
 				}
 			}
 		);
@@ -251,6 +300,8 @@ Model = function() {
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
 			uuid: randomID
 		});
+		
+		console.log("chat init");
 	}
 	
 	this.getMessages = function() {
@@ -259,11 +310,12 @@ Model = function() {
 	
 	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(){
-		if(this.currentFilter == ""){
-				this.currentFilter = "59.34045571 18.03018451"; 	//REMOVE LATER 
+		if(this.currentChannel == ""){
+				//console.log(model.Location);
+				this.currentChannel = "123";
 		}
 		this.chatChannel.subscribe({
-		      channel: this.currentFilter,
+		      channel: this.currentChannel,
 		      message: function(m){
 					model.newMessage = m;
 					model.notifyObservers("newMessage");
@@ -277,13 +329,15 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		if(chatMsg != ""){
+			this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		}
 	}
 	
 	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
 		PUBNUB.unsubscribe({
-			channel: this.currentFilter,
+			channel: this.currentChannel,
 		});
 	}
 
@@ -317,6 +371,5 @@ Model = function() {
 				draggable: true,
 			});
 		}
-		
 	}
 }
