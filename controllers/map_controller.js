@@ -4,12 +4,16 @@ MapController = function(model, mainController, view) {
 
 	if (!model.loggedIn) {
 		model.getAccessTokenFromUrl();
+		//$.mobile.navigate("#mapView");
 	}
 
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
 
-		if (msg === "gotNearbyMedia") {
+		if (msg === "gotAccessToken") {
+			console.log("mapView");
+			$.mobile.navigate("#mapView");
+		} else if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
 		}
 	}
@@ -39,10 +43,19 @@ MapController = function(model, mainController, view) {
 
 				var mapOverlay = (new google.maps.InfoWindow({
 					"content": content,
-					"position": position
+					"position": position,
+					"disableAutoPan": true
 				}));
 
+				content.addEventListener("click", function() {
+					alert("click");
+				});
+
 				mapOverlay.open(this.map);
+
+				google.maps.event.addDomListener(mapOverlay, "click", function() {
+					console.log("klickade");
+				});
 
 				mapOverlays.push(mapOverlay);
 			}

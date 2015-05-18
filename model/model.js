@@ -52,7 +52,8 @@ Model = function() {
 	}
 
 	this.getAccessTokenFromUrl = function() {
-		if(window.location.hash !== "") {
+		console.log(window.location.hash.substring(1, 13));
+		if(window.location.hash.substring(1, 13) === "access_token") {
 			this.accessToken = window.location.hash;
 			this.accessToken = this.accessToken.substring(this.accessToken.indexOf("=") + 1);
 			this.loggedIn = true;
