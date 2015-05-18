@@ -167,30 +167,25 @@
 		return filteredData;
 	}
 	
-<<<<<<< HEAD
 	this.setChannel = function(data, category, searchString) {
 		if(this.currentChannel == "123" && this.loading == true){
 			model.notifyObservers("newChannel");
 			this.loading = false;
-		}
-		
-		else{
-			if(this.currentChannel != ""){
+		} else {
+			if (this.currentChannel != "") {
 				this.leaveChat();
 				console.log("leaving nr: "+this.currentChannel);
 			}
 		
 			var resolution = 2;
-			var lat = data.A;
-			var lang = data.F;
-			var position = "Position: "+this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+			var lat = data[0];
+			var lang = data[1];
+			var position = lat + " " + lang;
 			
-			if((category == "hashtags") && (searchString != "")){
+			if ((category == "hashtags") && (searchString != "")) {
 				this.currentChannel = position + " #"+searchString;
 				model.notifyObservers("newChannel");
-			}
-			
-			else{
+			} else {
 				this.currentChannel = position;
 				model.notifyObservers("newChannel");
 			}
@@ -198,6 +193,8 @@
 	}
 	
 	this.geoHash = function(coord, resolution) {
+		console.log(coord);
+
 		if (resolution == RESOLUTIONS["world"]) {
 			var hashed = 0;
 		} else {
@@ -338,6 +335,7 @@
 
 			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
 				function(data) {
+					console.log(data)
 					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count);
 				}
 			);

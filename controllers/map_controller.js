@@ -103,6 +103,10 @@
 		var resolution = model.determineResolution(zoom);
 		var distance = model.determineDistance(zoom);
 
+		console.log(location)
+		console.log(location.A)
+		console.log(location.F)
+
 		var roundedLocation = [model.geoHash(location.A, resolution), model.geoHash(location.F, resolution)];
 
 		if (model.locationIsDifferent(roundedLocation)) { // om den nya positionen är annorlunda än den tidigare
