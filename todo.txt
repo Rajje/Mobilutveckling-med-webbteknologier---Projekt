@@ -1,0 +1,3 @@
+Logga ut 
+Scrolla och grejer i chatten
+Filter högst upp alltid
