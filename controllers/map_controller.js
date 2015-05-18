@@ -96,9 +96,9 @@ MapController = function(model, mainController, view) {
 	});
 
 	$("#searchForm").submit(function(event) {
+		model.setChatChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
 		model.clearNearbyMedia();
 		model.loadNearbyMedia(model.userLocation, event.target.category.value, event.target.searchInput.value);
-
 		return false;
 	});
 

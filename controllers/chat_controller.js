@@ -2,7 +2,12 @@ ChatController = function(model, mainController, view) {
 
 	this.printMessages = function() {
 		var message = model.getMessages();
-		$("#messageGrid").append(this.styleMessage(message));
+		console.log(message);
+		if(message =! ""){
+			console.log(message);
+			$("#messageGrid").append(this.styleMessage(message));
+		}
+		console.log(message);
 	}
 	
 	this.update = function(msg) {
