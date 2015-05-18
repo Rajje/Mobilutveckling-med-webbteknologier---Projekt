@@ -158,6 +158,7 @@ Model = function() {
 	
 	this.setChannel = function(data, category, searchString) {
 		model.notifyObservers("newChannel");
+		this.leaveChat();
 		
 		var resolution = 2;
 		var lat = data.A;
@@ -170,7 +171,6 @@ Model = function() {
 		else{
 				this.currentChannel = position;
 		}
-		
 		console.log("subscribed to :"+this.currentChannel);
 		this.subscribeToChat();
 	}
