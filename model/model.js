@@ -20,15 +20,38 @@ Model = function() {
 		console.log("test");
 		this.notifyObservers("test");
 	}
-	
-	this.subscribe = function(controller) {
-		this.observers.push(controller);
-	}
-	
+
 	this.notifyObservers = function(msg) {
 		for (var i in this.observers) {
 			this.observers[i].update(msg);
 		}
+	}
+
+	this.foundLocation = function(position) {
+		// Anropas när användarens position har fastställts. 
+		this.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		this.notifyObservers("foundLocation");
+		this.setChannel(this.userLocation); // ska kompletteras med hur funktionen faktiskt ska anropas
+	}
+
+	this.noLocation = function(message) {
+		// Anropas när användarens position EJ kunde fastställas
+		console.log(message);
+	}
+
+	this.locateUser = function() {
+		navigator.geolocation.getCurrentPosition( // hämta användarens position
+			function(position) { // callback om position hittas
+				model.foundLocation(position);
+			},
+			function(position) { // callback om position EJ hittas
+				model.noLocation(position);
+			}
+		);
+	}
+	
+	this.subscribe = function(controller) {
+		this.observers.push(controller);
 	}
 
 	this.cameFromInstagramLogin = function() {
