@@ -44,9 +44,6 @@ MainController = function(model) {
 		mainController.chatController = new ChatController(model, mainController, $('#chatView'));
 		mainController.popupController = new PopUpController(model, mainController, $('#popUpView'));
 	});
-
-	$(document).on("pageshow","#mapView", this.setContentSize);
-	$(document).on("pageshow","#chatView", this.setContentSize);
 		
 		$(".searchForm").submit(function(event) {
 			console.log("clicked search");
@@ -56,7 +53,8 @@ MainController = function(model) {
 			model.loadNearbyMedia(mainController.mapController.map.getCenter(), event.target.category.value, event.target.searchInput.value);
 			return false;
 		});
-		
-	});
-	window.addEventListener("resize", this.setContentSize);
-}
+
+		$(document).on("pageshow","#mapView", this.setContentSize);
+		$(document).on("pageshow","#chatView", this.setContentSize);
+		window.addEventListener("resize", this.setContentSize);		
+	}
