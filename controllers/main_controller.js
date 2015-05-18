@@ -12,27 +12,11 @@ MainController = function(model) {
 		var screenFooter = $('[data-role="footer"]', this).height();
 		var chatScreenBar = $('#chatBar').height();
 		var theRoom = $('#currentRoom').height();
-
-		console.log("height" + screenHeight);
-		console.log("room" + theRoom);
-		console.log("bar" + chatScreenBar);
-		console.log("header" + screenHeader);
-		console.log("footer" + screenFooter);
-
 		var mapContentHeight = screenHeight - screenHeader - screenFooter - 2;
 		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - theRoom - 2;
 		$('#map').height(mapContentHeight + "px");
 		$('#messageGrid').height(chatContentHeight + "px");
 	}
-
-
-
-
-
-
-
-
-
 
 	this.addSearchHeader = function(view) {
 		var header = '<form class="searchForm">\
@@ -82,7 +66,6 @@ MainController = function(model) {
 			model.subscribeToChat();
 			model.getChatHistory();
 		}
-
 
 	}
 

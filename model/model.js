@@ -5,7 +5,6 @@ Model = function() {
 	this.loggedIn = false;
 	this.nearbyMedia = [];
 	this.locationIDs = null;
-	this.nearbyMedia = [];
 	this.popupImage = {};
 
 	//For chat
@@ -14,6 +13,7 @@ Model = function() {
 	this.newMessage;
 	this.chatChannel;
 	this.color;
+	var _this = this;
 	
 	var model = this;
 
@@ -182,15 +182,68 @@ Model = function() {
 		return Math.floor(coord * rez) / rez;
 	}
 
-	this.loadImage = function(mediaID) {
+	this.loadImage = function(mediaID, nI, nJ) {
+		console.log(nI + " "+  nJ);
+		this.setPopupImagePosition(nI, nJ);
 		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
-			function(data) {
-				model.popupImage.url = data.data.images.standard_resolution.url;
-				model.popupImage.width = data.data.images.standard_resolution.width;
-				model.popupImage.height = data.data.images.standard_resolution.height;
+			function(data, nI, nJ) {
+				model.setPopupImage(data.data);
 				model.notifyObservers("loadImage");
 			}
 		);
+	}
+
+	this.setPopupImagePosition = function(nI, nJ) {
+		this.popupImage.nI = nI;
+		this.popupImage.nJ = nJ;
+	}
+
+	this.setPopupImage = function(data, nI, nJ) {
+		this.popupImage.id = data.id;
+		this.popupImage.url = data.images.standard_resolution.url;
+		this.popupImage.width = data.images.standard_resolution.width;
+		this.popupImage.height = data.images.standard_resolution.height;
+		this.popupImage.caption = data.caption;
+		this.popupImage.comments = data.comments;
+	}
+
+	this.getNextPopupImage = function() {
+		var nI = parseInt(this.popupImage.nI);
+		var nJ = parseInt(this.popupImage.nJ) + 1;
+		if (nJ >= this.nearbyMedia[nI].data.length) {
+			nJ = 0;
+			if (nI >= this.nearbyMedia.length - 1) {
+				nI = 0;
+			} else {
+				nI += 1;
+			}
+		}
+		console.log(nI + " "+  nJ);
+
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("nextPopupImage");
+	}
+
+	this.getPreviousPopupImage = function() {
+		//hitta bilden som nu visas i listan med all media
+		var nI = parseInt(this.popupImage.nI);
+		var nJ = parseInt(this.popupImage.nJ) - 1;
+
+		if (nJ < 0) {
+			if (nI <= 0) {
+				nI = this.nearbyMedia.length - 1;
+			} else {
+				nI -= 1;
+			}
+			nJ = this.nearbyMedia[nI].data.length - 1;
+		}
+		console.log(nI + " "+  nJ);
+
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("nextPopupImage");
+		
 	}
 
 	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {
@@ -268,11 +321,10 @@ Model = function() {
 	
 	//Meddelande GO, press enter = skicka meddelande 
 	this.getChatHistory = function() {
-		
-		PUBNUB.history({
+		this.chatChannel.history({
 			channel: this.currentChannel,
 			count: 10,
-			callback: function(m){console.log(m)}			
+			callback: function(m){_this.sendMessage(m[0])}			
 		});
 	}
 	
@@ -325,7 +377,7 @@ Model = function() {
 					model.newMessage = m;
 					model.notifyObservers("newMessage");
 			  },
-		      connect: function(){console.log("Connected"); subscribed = true},
+		      connect: function(){console.log("Connected"); model.getChatHistory(); subscribed = true},
 		      disconnect: function(){console.log("Disconnected")},
 		      reconnect: function(){console.log("Reconnected")},
 		      error: function(){console.log("Network Error")},
@@ -335,8 +387,16 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		if(chatMsg != ""){
-			this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		
+		if(typeof chatMsg == 'object'){
+			for(var i = 0; i < chatMsg.length-1; i++){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg[i].chatMsg, chatMsg[i].alias, chatMsg[i].textColor, chatMsg[i].profileImage)});
+			}
+		}
+		else{
+			if(chatMsg != ""){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+			}
 		}
 	}
 	
