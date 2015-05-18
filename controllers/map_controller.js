@@ -83,9 +83,13 @@
 	}
 
 	$(document).on("pageshow", view, function() {
-		if (!_this.map) {
+		if (!_this.map) { // om inte kartan finns sedan tidigare
 			_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 			model.locateUser();
+
+			google.maps.event.addListener(_this.map, "drag", function() {
+				console.log("drag");
+			});
 		}
 	});
 

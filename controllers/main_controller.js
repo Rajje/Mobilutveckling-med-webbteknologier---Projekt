@@ -51,7 +51,6 @@ MainController = function(model) {
 			return false;
 		});
 		
+		window.addEventListener("resize", this.setContentSize);
 	});
-	
-	window.addEventListener("resize", this.setContentSize);
 }
