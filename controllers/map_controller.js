@@ -13,9 +13,7 @@
 
 		if (msg === "foundLocation") {
 			this.map.setCenter(model.userLocation);
-			this.map.setZoom(18);
-			this.displaySearching();
-			model.loadNearbyMedia(model.userLocation);
+			this.setNewPosition();
 		} else if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
 			this.displayResultCount();
@@ -99,15 +97,47 @@
 		view.find('#searchResults').html(resultCountString);
 	}
 
+	this.setNewPosition = function() {
+		var location = this.map.getCenter();
+		var zoom = this.map.getZoom();
+		var resolution = model.determineResolution(zoom);
+		var distance = model.determineDistance(zoom);
+
+		var roundedLocation = new google.maps.LatLng(model.geoHash(location.A, resolution), model.geoHash(location.F, resolution));
+
+		if (model.locationIsDifferent(roundedLocation)) { // om den nya positionen är annorlunda än den tidigare
+			model.roundedLocation = roundedLocation;
+
+			model.clearNearbyMedia();
+			this.displaySearching();
+			
+			if (model.curentTag !== "") {
+				var category = "hashtags";
+				model.setChannel(location, category, model.currentTag);
+				model.loadNearbyMedia(location, distance, category, model.currentTag);
+			} else {
+				model.setChannel(roundedLocation);
+				model.loadNearbyMedia(location, distance);
+			}
+
+		}		
+	}
+
 	$(document).on("pageshow", view, function() {
-		if (!_this.map) {
+		if (!_this.map) { // om inte kartan finns sedan tidigare
 			_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 			model.locateUser();
-			$("#positionButton").click(function() {
-				model.locateUser();
+			google.maps.event.addListener(_this.map, "dragend", function() {
+				_this.setNewPosition();
+			});
+			google.maps.event.addListener(_this.map, "zoom_changed", function() {
+				_this.setNewPosition();
 			});
 		}
-	});
+		$("#positionButton").click(function() {
+			model.locateUser();
+		});
+});
 
 
 	model.subscribe(this);
