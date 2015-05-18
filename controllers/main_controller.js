@@ -11,8 +11,9 @@ MainController = function(model) {
 		var screenHeader = $('[data-role="header"]', this).height();
 		var screenFooter = $('[data-role="footer"]', this).height();
 		var chatScreenBar = $('#chatBar').height();
+		var currentRoom = $('#currentRoom').height();
 		var mapContentHeight = screenHeight - screenHeader - screenFooter - 2;
-		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - 2;
+		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - 2 - currentRoom;
 		$('#map').height(mapContentHeight + "px");
 		$('#messageGrid').height(chatContentHeight + "px");
 	}
@@ -43,7 +44,6 @@ MainController = function(model) {
 		mainController.mapController = new MapController(model, mainController, $('#mapView'));
 		mainController.chatController = new ChatController(model, mainController, $('#chatView'));
 		mainController.popupController = new PopUpController(model, mainController, $('#popUpView'));
-	});
 		
 		$(".searchForm").submit(function(event) {
 			console.log("clicked search");
@@ -53,6 +53,7 @@ MainController = function(model) {
 			model.loadNearbyMedia(mainController.mapController.map.getCenter(), event.target.category.value, event.target.searchInput.value);
 			return false;
 		});
+	});
 
 		$(document).on("pageshow","#mapView", this.setContentSize);
 		$(document).on("pageshow","#chatView", this.setContentSize);
