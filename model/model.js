@@ -184,8 +184,10 @@ Model = function() {
 
 				count += 1;
 
-				if ((model.numberOfNearbyMedia() < 20) && (count <= 5)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
+				if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
 					model.loadNearbyMedia(position, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+				} else {
+					model.notifyObservers("loadNearbyMedia_done");
 				}
 			}
 		);
