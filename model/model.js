@@ -14,6 +14,7 @@ Model = function() {
 	this.newMessage;
 	this.chatChannel;
 	this.color;
+	var _this = this;
 	
 	var model = this;
 
@@ -268,11 +269,10 @@ Model = function() {
 	
 	//Meddelande GO, press enter = skicka meddelande 
 	this.getChatHistory = function() {
-		
-		PUBNUB.history({
+		this.chatChannel.history({
 			channel: this.currentChannel,
 			count: 10,
-			callback: function(m){console.log(m)}			
+			callback: function(m){_this.sendMessage(m[0])}			
 		});
 	}
 	
@@ -325,7 +325,7 @@ Model = function() {
 					model.newMessage = m;
 					model.notifyObservers("newMessage");
 			  },
-		      connect: function(){console.log("Connected"); subscribed = true},
+		      connect: function(){console.log("Connected"); model.getChatHistory(); subscribed = true},
 		      disconnect: function(){console.log("Disconnected")},
 		      reconnect: function(){console.log("Reconnected")},
 		      error: function(){console.log("Network Error")},
@@ -335,8 +335,16 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		if(chatMsg != ""){
-			this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		
+		if(typeof chatMsg == 'object'){
+			for(var i = 0; i < chatMsg.length-1; i++){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg[i].chatMsg, chatMsg[i].alias, chatMsg[i].textColor, chatMsg[i].profileImage)});
+			}
+		}
+		else{
+			if(chatMsg != ""){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+			}
 		}
 	}
 	

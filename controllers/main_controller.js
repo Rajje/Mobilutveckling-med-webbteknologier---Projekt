@@ -11,9 +11,9 @@ MainController = function(model) {
 		var screenHeader = $('[data-role="header"]', this).height();
 		var screenFooter = $('[data-role="footer"]', this).height();
 		var chatScreenBar = $('#chatBar').height();
-		var currentRoom = $('#currentRoom').height();
+		var currRoom = $('#currentRoom').height();
 		var mapContentHeight = screenHeight - screenHeader - screenFooter - 2;
-		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - 2 - currentRoom;
+		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - currRoom - 2;
 		$('#map').height(mapContentHeight + "px");
 		$('#messageGrid').height(chatContentHeight + "px");
 	}

@@ -2,7 +2,6 @@ ChatController = function(model, mainController, view) {
 
 	this.printMessages = function() {
 		var message = model.getMessages();
-		console.log(message);
 		$("#messageGrid").append(this.styleMessage(message));
 	}
 	
@@ -14,7 +13,6 @@ ChatController = function(model, mainController, view) {
 			$("#currentRoom").empty();
 			$("#currentRoom").append("<p>"+model.currentChannel+"</p>");
 			model.subscribeToChat();
-			model.getChatHistory();
 		}
 	}
 	

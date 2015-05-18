@@ -14,7 +14,7 @@ PopUpController = function(model, mainController, view) {
 		var alias = model.getAlias();
 	
 		if (clickedUser == alias) {
-			_this.createPopUp("user");
+			_this.createPopUpUser("user");
 		} else {
 			model.getNewUser(clickedUser); 
 		}
