@@ -31,7 +31,7 @@ Model = function() {
 		// Anropas när användarens position har fastställts. 
 		this.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 		this.notifyObservers("foundLocation");
-		this.setChannel(this.userLocation); // ska kompletteras med hur funktionen faktiskt ska anropas
+		this.setChannel(this.userLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
 	}
 
 	this.noLocation = function(message) {
@@ -156,21 +156,23 @@ Model = function() {
 		return filteredData;
 	}
 	
-	this.setChannel = function(data) {
+	this.setChannel = function(data, category, searchString) {
+		model.notifyObservers("newChannel");
+		
 		var resolution = 2;
 		var lat = data.A;
 		var lang = data.F;
-		this.currentChannel = this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
-		console.log(this.currentChannel);
-		this.subscribeToChat();
-	}
-	
-	this.updateChannel = function(data, category, searchString) {
+		var position = this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
 		
-		if(category = "hashtags"){
-				this.currentChannel += " "+searchString;
-				console.log(this.currentChannel);
+		if(category = "hashtags"){						
+				this.currentChannel = position +searchString;
 		}
+		else{
+				this.currentChannel = position;
+		}
+		
+		console.log("subscribed to :"+this.currentChannel);
+		this.subscribeToChat();
 	}
 	
 	this.geoHash = function(coord, resolution) {
