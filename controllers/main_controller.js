@@ -44,7 +44,7 @@ MainController = function(model) {
 		
 		$(".searchForm").submit(function(event) {
 			console.log("clicked search");
-			model.updateChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
+			model.setChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
 			model.clearNearbyMedia();
 			mainController.mapController.displaySearching();
 			model.loadNearbyMedia(mainController.mapController.map.getCenter(), event.target.category.value, event.target.searchInput.value);
