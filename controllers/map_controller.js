@@ -80,8 +80,7 @@ MapController = function(model, mainController, view) {
 		console.log(message);
 	}
 
-	$(document).on("pageshow", "#mapView", function() {
-		console.log("map init");
+	$(document).on("pageshow", view, function() {
 		// Infogar en Google-karta i elementet med id "map"
 		_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 
@@ -97,7 +96,7 @@ MapController = function(model, mainController, view) {
 
 	$("#searchForm").submit(function(event) {
 		model.clearNearbyMedia();
-		model.loadNearbyMedia(model.userLocation, event.target.category.value, event.target.searchInput.value);
+		model.loadNearbyMedia(_this.map.getCenter(), event.target.category.value, event.target.searchInput.value);
 
 		return false;
 	});
