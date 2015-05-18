@@ -13,6 +13,7 @@ Model = function() {
 	this.newMessage;
 	this.chatChannel;
 	this.color;
+	var _this = this;
 	
 	var model = this;
 
@@ -157,22 +158,23 @@ Model = function() {
 	}
 	
 	this.setChannel = function(data, category, searchString) {
-		model.notifyObservers("newChannel");
-		this.leaveChat();
+		if(this.currentChannel != ""){
+			this.leaveChat();
+		}
 		
 		var resolution = 2;
 		var lat = data.A;
 		var lang = data.F;
-		var position = this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+		var position = "Position: "+this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
 		
-		if(category = "hashtags"){						
-				this.currentChannel = position +searchString;
+		if((category == "hashtags") && (searchString != "")){
+				this.currentChannel = position + " #"+searchString;
+				model.notifyObservers("newChannel");
 		}
 		else{
 				this.currentChannel = position;
+				model.notifyObservers("newChannel");
 		}
-		console.log("subscribed to :"+this.currentChannel);
-		this.subscribeToChat();
 	}
 	
 	this.geoHash = function(coord, resolution) {
@@ -299,7 +301,6 @@ Model = function() {
 			function(data){
 				var theUser; 
 				if(data.data.length > 1){
-					console.log("checking");
 					for(var i = 0; i < data.data.length; i++){
 						if(data.data[i].username == alias){
 							theUser = data.data[i];
@@ -315,6 +316,16 @@ Model = function() {
 			});
 			
 		return r;
+	}
+	
+	
+	//Meddelande GO, press enter = skicka meddelande 
+	this.getChatHistory = function() {
+		this.chatChannel.history({
+			channel: this.currentChannel,
+			count: 10,
+			callback: function(m){_this.sendMessage(m[0])}			
+		});
 	}
 	
 	this.getUser = function() {
@@ -352,8 +363,6 @@ Model = function() {
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
 			uuid: randomID
 		});
-		
-		console.log("chat init");
 	}
 	
 	this.getMessages = function() {
@@ -362,33 +371,38 @@ Model = function() {
 	
 	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(){
-		if(this.currentChannel == ""){
-				//console.log(model.Location);
-				this.currentChannel = "123";
-		}
 		this.chatChannel.subscribe({
 		      channel: this.currentChannel,
 		      message: function(m){
 					model.newMessage = m;
 					model.notifyObservers("newMessage");
 			  },
-		      connect: function(){console.log("Connected"); subscribed = true},
+		      connect: function(){console.log("Connected"); model.getChatHistory(); subscribed = true},
 		      disconnect: function(){console.log("Disconnected")},
 		      reconnect: function(){console.log("Reconnected")},
 		      error: function(){console.log("Network Error")},
 	 	});		
+		
 	}
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		if(chatMsg != ""){
-			this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		
+		if(typeof chatMsg == 'object'){
+			for(var i = 0; i < chatMsg.length-1; i++){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg[i].chatMsg, chatMsg[i].alias, chatMsg[i].textColor, chatMsg[i].profileImage)});
+			}
+		}
+		else{
+			if(chatMsg != ""){
+				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+			}
 		}
 	}
 	
 	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
-		PUBNUB.unsubscribe({
+		this.chatChannel.unsubscribe({
 			channel: this.currentChannel,
 		});
 	}
