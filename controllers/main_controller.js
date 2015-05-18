@@ -5,6 +5,15 @@ MainController = function(model) {
 		model.test();
 	}
 
+	this.setContentSize = function() {
+		var screenHeight = $(window).height();
+		var screenHeader = $('[data-role="header"]').height();
+		var screenFooter = $('[data-role="footer"]').height();
+		var contentHeight = screenHeight - screenHeader - screenFooter;
+		console.log("Header = " + screenHeader + " ContentHeight = " + contentHeight + " Footer = " + screenFooter);
+		$('#map').height(contentHeight + "px");
+	}
+
 	this.addSearchHeader = function(view) {
 		var header = '<form id="searchForm">\
 				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>\
@@ -31,5 +40,8 @@ MainController = function(model) {
 		mainController.mapController = new MapController(model, mainController, $('#mapView'));
 		mainController.chatController = new ChatController(model, mainController, $('#chatView'));
 		mainController.popupController = new PopUpController(model, mainController, $('#popUpView'));
+		mainController.setContentSize();
 	});
+
+	window.addEventListener("resize", this.setContentSize);
 }
