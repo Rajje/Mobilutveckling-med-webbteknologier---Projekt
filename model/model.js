@@ -6,6 +6,7 @@ Model = function() {
 	this.nearbyMedia = [];
 	this.locationIDs = null;
 	this.nearbyMedia = [];
+	this.popupImage = {};
 
 	//For chat
 	this.user = "";
@@ -179,6 +180,17 @@ Model = function() {
 	this.geoHash = function(coord, resolution) {
 		var rez = Math.pow( 10, resolution || 0);
 		return Math.floor(coord * rez) / rez;
+	}
+
+	this.loadImage = function(mediaID) {
+		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
+			function(data) {
+				model.popupImage.url = data.data.images.standard_resolution.url;
+				model.popupImage.width = data.data.images.standard_resolution.width;
+				model.popupImage.height = data.data.images.standard_resolution.height;
+				model.notifyObservers("loadImage");
+			}
+		);
 	}
 
 	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {

@@ -36,9 +36,10 @@
 			<div data-role="page" data-theme="b" class="view" id="mapView">
 				<div data-role="header">
 				</div>
-
 				<div data-role="main">
 					<div id="mapContainer">
+						<div data-role="popup" id="popupImage" class="imagepopup">
+						</div>
 						<div id="map"></div>
 					</div>
 				</div>
@@ -61,16 +62,16 @@
 				<div data-role="main"> 
 					<div id="chatWindow">
 						<div id = "currentRoom"></div>
-						<div class ='ui-grid-a' id= "messageGrid">
+						<div class ='ui-grid-a' id='messageGrid' style="overflow: scroll;">
 						</div>
 					</div>
-					<div data-role="navbar">
+					<div data-role="navbar" id="chatBar">
 						<ul>
 							<li id="chatInput">
 								<input type="text" data-mini="true" placeholder="Put a text here" id="textInput"></input>
 							</li>
 							<li id="chatSubmit">
-								<button style="margin-top:3px" class="ui-btn ui-mini ui-btn-inline ui-corner-all" id="sendMsg">Submit</button>
+								<button style="margin-top:1px" class="ui-btn ui-mini ui-btn-inline ui-corner-all" id="sendMsg">Submit</button>
 							</li>
 						</ul>
 					</div>
