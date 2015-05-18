@@ -16,7 +16,7 @@ MainController = function(model) {
 
 	this.addSearchHeader = function(view) {
 		var header = '<form class="searchForm">\
-				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>\
+				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search" class="searchInput"></input>\
 				<div id="searchResults"></div>\
 				<div class="ui-grid-a">\
 					<div class="ui-block-a">\
@@ -43,11 +43,18 @@ MainController = function(model) {
 		mainController.setContentSize();
 		
 		$(".searchForm").submit(function(event) {
-			console.log("clicked search");
-			model.setChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
+			model.currentTag = event.target.searchInput.value;
+			var category = event.target.category.value;
+			var zoom = mainController.mapController.map.getZoom();
+			var resolution = model.determineResolution(zoom);
+			var distance = model.determineDistance(zoom);
+
+			model.setChannel(model.roundedLocation, category, model.currentTag);
+
 			model.clearNearbyMedia();
 			mainController.mapController.displaySearching();
-			model.loadNearbyMedia(mainController.mapController.map.getCenter(), event.target.category.value, event.target.searchInput.value);
+			model.loadNearbyMedia(model.roundedLocation, distance, category, model.currentTag);
+
 			return false;
 		});
 		

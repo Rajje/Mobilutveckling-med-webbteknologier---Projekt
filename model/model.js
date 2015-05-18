@@ -6,6 +6,8 @@ Model = function() {
 	this.nearbyMedia = [];
 	this.locationIDs = null;
 	this.nearbyMedia = [];
+	this.roundedLocation = null;
+	this.currentTag = "";
 
 	//For chat
 	this.user = "";
@@ -31,7 +33,6 @@ Model = function() {
 		// Anropas när användarens position har fastställts. 
 		this.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 		this.notifyObservers("foundLocation");
-		this.setChannel(this.userLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
 	}
 
 	this.noLocation = function(message) {
@@ -100,7 +101,7 @@ Model = function() {
 			function(data) {
 				model.locationIDs = data;
 				model.notifyObservers("gotLocationIDs");
-				model.loadNearbyMedia();
+				model.loadNearbyMedia(position);
 			}
 		);
 	}
@@ -151,19 +152,20 @@ Model = function() {
 					filteredData.data.push(data.data[i]);
 				}
 			}
+		} else if (category == "locationExistence") {
+			for (var i in data.data) {
+				if (data.data[i].location) filteredData.data.push(data.data[i]);
+			}
 		}
 
 		return filteredData;
 	}
 	
-	this.setChannel = function(data, category, searchString) {
+	this.setChannel = function(location, category, searchString) {
 		model.notifyObservers("newChannel");
 		this.leaveChat();
-		
-		var resolution = 2;
-		var lat = data.A;
-		var lang = data.F;
-		var position = this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+
+		var position = location.A+ " "+ location.F;
 		
 		if(category = "hashtags"){						
 				this.currentChannel = position +searchString;
@@ -176,36 +178,85 @@ Model = function() {
 	}
 	
 	this.geoHash = function(coord, resolution) {
-		var rez = Math.pow( 10, resolution || 0);
-		return Math.floor(coord * rez) / rez;
+		if (resolution == RESOLUTIONS["world"]) {
+			var hashed = 0;
+		} else {
+			var rez = Math.pow( 10, resolution || 0);
+			var hashed = Math.floor(coord * rez) / rez;
+		}
+
+		return hashed;
 	}
 
-	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {
+	this.determineResolution = function(zoom) {
+		// Recieves a google map zoom integer. Returns the geohash resolution to be used with that zoom. 
+		var resolution = 0;
+
+		if (zoom >= 15) resolution = RESOLUTIONS["local"];
+		else if (zoom >= 12 && zoom < 15) resolution = RESOLUTIONS["district"];
+		else if (zoom < 12) resolution = RESOLUTIONS["world"];
+
+		return resolution;
+	}
+
+	this.determineDistance = function(zoom) {
+		// Recieves a google map zoom integer. Returns the distance whithin which to search for images.
+		var distance = 0;
+
+		if (zoom >= 15) distance = DISTANCES["local"];
+		else if (zoom >= 12 && zoom < 15) distance = DISTANCES["district"];
+		else if (zoom < 12) distance = DISTANCES["world"];
+
+		return distance;
+	}
+
+	this.locationIsDifferent = function(roundedLocation) {
+		if (model.roundedLocation) return ((roundedLocation.A != model.roundedLocation.A) || (roundedLocation.F != model.roundedLocation.F));
+		else return true;
+	}
+
+	this.mediaCallback = function(data, position, distance, category, searchString, maxTimestamp, count) {
+		if (data.data.length > 0) {
+			var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
+			if (distance == "WORLD") data = model.filterMedia(data, "locationExistence");
+			if (searchString) data = model.filterMedia(data, category, searchString);
+		}
+
+		if (data.data.length > 0) {
+			model.nearbyMedia.push(data); // spara bunten med hittade bilder
+			model.notifyObservers("gotNearbyMedia");
+		}
+
+		count += 1;
+
+		if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
+			model.loadNearbyMedia(position, distance, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+		} else {
+			model.notifyObservers("loadNearbyMedia_done");
+		}
+	}
+
+	this.loadNearbyMedia = function(position, distance, category, searchString, maxTimestamp, count) {
 		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
-		var latitude = position.A;
-		var longitude = position.F;
-		var distance = 500;
+		
 		var count = count ? count : 0;
 
-		this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
-			function(data) {
-				var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
-
-				if ((data.data.length > 0) && searchString) data = model.filterMedia(data, category, searchString);
-				if (data.data.length > 0) {
-					model.nearbyMedia.push(data); // spara bunten med hittade bilder
-					model.notifyObservers("gotNearbyMedia");
+		if (distance == "WORLD") {
+			this.getHttp("https://api.instagram.com/v1/media/popular?max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken, 
+				function(data) {
+					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count);
 				}
+			);
+		} else {
+			var latitude = position.A;
+			var longitude = position.F;
 
-				count += 1;
-
-				if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
-					model.loadNearbyMedia(position, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
-				} else {
-					model.notifyObservers("loadNearbyMedia_done");
+			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
+				function(data) {
+					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count)
 				}
-			}
-		);
+			);
+		}		
 	}
 
 	this.clearNearbyMedia = function() {
