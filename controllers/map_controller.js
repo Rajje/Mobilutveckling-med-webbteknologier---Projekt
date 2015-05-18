@@ -90,7 +90,7 @@
 	});
 
 	view.find('#searchForm').submit(function(event) {
-		model.setChatChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
+		model.updateChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
 		model.clearNearbyMedia();
 		_this.displaySearching();
 		model.loadNearbyMedia(_this.map.getCenter(), event.target.category.value, event.target.searchInput.value);

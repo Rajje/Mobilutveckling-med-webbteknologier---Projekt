@@ -165,8 +165,12 @@ Model = function() {
 		this.subscribeToChat();
 	}
 	
-	this.setChatChannel = function(data, category, searchString) {
+	this.updateChannel = function(data, category, searchString) {
 		
+		if(category = "hashtags"){
+				this.currentChannel += " "+searchString;
+				console.log(this.currentChannel);
+		}
 	}
 	
 	this.geoHash = function(coord, resolution) {
@@ -282,6 +286,8 @@ Model = function() {
 			subscribe_key: 'sub-c-ee7c4d30-e9ba-11e4-a30c-0619f8945a4f',
 			uuid: randomID
 		});
+		
+		console.log("chat init");
 	}
 	
 	this.getMessages = function() {
@@ -309,7 +315,9 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		if(chatMsg != ""){
+			this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		}
 	}
 	
 	//Function for unsubscribing from a chat channel
@@ -349,6 +357,5 @@ Model = function() {
 				draggable: true,
 			});
 		}
-		
 	}
 }
