@@ -103,7 +103,7 @@
 		var resolution = model.determineResolution(zoom);
 		var distance = model.determineDistance(zoom);
 
-		var roundedLocation = new google.maps.LatLng(model.geoHash(location.A, resolution), model.geoHash(location.F, resolution));
+		var roundedLocation = [model.geoHash(location.A, resolution), model.geoHash(location.F, resolution)];
 
 		if (model.locationIsDifferent(roundedLocation)) { // om den nya positionen är annorlunda än den tidigare
 			model.roundedLocation = roundedLocation;
@@ -113,7 +113,7 @@
 			
 			if (model.curentTag !== "") {
 				var category = "hashtags";
-				model.setChannel(location, category, model.currentTag);
+				model.setChannel(roundedLocation, category, model.currentTag);
 				model.loadNearbyMedia(location, distance, category, model.currentTag);
 			} else {
 				model.setChannel(roundedLocation);
