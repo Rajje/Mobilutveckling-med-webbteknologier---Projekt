@@ -15,14 +15,10 @@ MainController = function(model) {
 		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - 2;
 		$('#map').height(mapContentHeight + "px");
 		$('#messageGrid').height(chatContentHeight + "px");
-
-
-		
-
 	}
 
 	this.addSearchHeader = function(view) {
-		var header = '<form id="searchForm">\
+		var header = '<form class="searchForm">\
 				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>\
 				<div id="searchResults"></div>\
 				<div class="ui-grid-a">\
@@ -39,7 +35,6 @@ MainController = function(model) {
 			</form>';
 
 		view.append(header);
-
 	}
 
 	$(document).ready(function() {
@@ -52,6 +47,16 @@ MainController = function(model) {
 
 	$(document).on("pageshow","#mapView", this.setContentSize);
 	$(document).on("pageshow","#chatView", this.setContentSize);
-
+		
+		$(".searchForm").submit(function(event) {
+			console.log("clicked search");
+			model.setChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
+			model.clearNearbyMedia();
+			mainController.mapController.displaySearching();
+			model.loadNearbyMedia(mainController.mapController.map.getCenter(), event.target.category.value, event.target.searchInput.value);
+			return false;
+		});
+		
+	});
 	window.addEventListener("resize", this.setContentSize);
 }

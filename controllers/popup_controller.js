@@ -2,9 +2,11 @@ PopUpController = function(model, mainController, view) {
 	_this = this;
 
 	this.update = function(msg) {
-		if (msg == "loadPopup") {
-			this.createPopUp("other");
-		} 
+		if (msg === "loadPopup") {
+			this.createPopUpUser("other");
+		} else if (msg === "loadImage") {
+			this.createPopUpImage();
+		}
 	}
 
 	$("#messageGrid").on('click', '.userInfo', function(event){
@@ -19,9 +21,18 @@ PopUpController = function(model, mainController, view) {
 	
 	});
 
+	$(document).on("pagecreate", function() {
+		$(".imagepopup").on({
+			popupbeforeposition: function() {
+				var maxHeight = $(window).height() - 60 + "px";
+				$(".imagepopup img").css("max-height", maxHeight );
+			}
+		});
+	});
+
 	model.subscribe(this);
 		
-	this.createPopUp = function(type) {
+	this.createPopUpUser = function(type) {
 		var person;
 		
 		if (type == "user") {
@@ -37,5 +48,20 @@ PopUpController = function(model, mainController, view) {
 		$("#userName").append("<p>"+alias+"</p>");
 		$("#userName").prepend("<br><b><p>"+name+"</p></b>");
 		$("#userName").prepend("<img src='"+profilePic+"'>");
+	}
+
+	this.createPopUpImage = function() {
+		var div = $("#popupImage");
+		div.empty();
+		var img = $("<img/>");
+		img.attr("src", model.popupImage.url);
+		div.append(img);
+		img.load(function() {
+			div.popup("open", {
+					"positionTo": "window",
+					"transition": "pop"
+				}
+			);
+		});
 	}
 }
