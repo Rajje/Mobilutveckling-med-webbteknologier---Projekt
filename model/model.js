@@ -245,14 +245,12 @@ Model = function() {
 	this.loadImage = function(mediaID, nI, nJ) {
 		console.log(nI + " "+  nJ);
 		this.setPopupImagePosition(nI, nJ);
-		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
-		this.notifyObservers("loadImage");
-		// this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
-		// 	function(data, nI, nJ) {
-		// 		model.setPopupImage(data.data);
-		// 		model.notifyObservers("loadImage");
-		// 	}
-		// );
+		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
+			function(data, nI, nJ) {
+				model.setPopupImage(data.data);
+				model.notifyObservers("loadImage");
+			}
+		);
 	}
 
 	this.setPopupImagePosition = function(nI, nJ) {
@@ -260,7 +258,7 @@ Model = function() {
 		this.popupImage.nJ = nJ;
 	}
 
-	this.setPopupImage = function(data) {
+	this.setPopupImage = function(data, nI, nJ) {
 		this.popupImage.id = data.id;
 		this.popupImage.url = data.images.standard_resolution.url;
 		this.popupImage.width = data.images.standard_resolution.width;
@@ -325,7 +323,7 @@ Model = function() {
 
 			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
 				function(data) {
-					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count)
+					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count);
 				}
 			);
 		}		

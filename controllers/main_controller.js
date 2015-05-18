@@ -48,6 +48,7 @@ MainController = function(model) {
 		
 		$(".searchForm").submit(function(event) {
 			model.currentTag = event.target.searchInput.value;
+			var location = mainController.mapController.map.getCenter()
 			var category = event.target.category.value;
 			var zoom = mainController.mapController.map.getZoom();
 			var resolution = model.determineResolution(zoom);
@@ -57,7 +58,7 @@ MainController = function(model) {
 
 			model.clearNearbyMedia();
 			mainController.mapController.displaySearching();
-			model.loadNearbyMedia(model.roundedLocation, distance, category, model.currentTag);
+			model.loadNearbyMedia(location, distance, category, model.currentTag);
 
 			return false;
 		});
