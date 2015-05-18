@@ -35,9 +35,11 @@
 	this.foundLocation = function(position) {
 		// Anropas när användarens position har fastställts. 
 		this.userLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		this.roundedLocation = [this.geoHash(position.coords.latitude, 2), this.geoHash(position.coords.longitude, 2)]
 		this.notifyObservers("foundLocation");
 		console.log("foundLocation");
-		this.setChannel(this.userLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
+
+		this.setChannel(this.roundedLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
 
 	}
 
@@ -335,7 +337,6 @@
 
 			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
 				function(data) {
-					console.log(data)
 					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count);
 				}
 			);
