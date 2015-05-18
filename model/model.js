@@ -245,12 +245,14 @@ Model = function() {
 	this.loadImage = function(mediaID, nI, nJ) {
 		console.log(nI + " "+  nJ);
 		this.setPopupImagePosition(nI, nJ);
-		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
-			function(data, nI, nJ) {
-				model.setPopupImage(data.data);
-				model.notifyObservers("loadImage");
-			}
-		);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("loadImage");
+		// this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
+		// 	function(data, nI, nJ) {
+		// 		model.setPopupImage(data.data);
+		// 		model.notifyObservers("loadImage");
+		// 	}
+		// );
 	}
 
 	this.setPopupImagePosition = function(nI, nJ) {
@@ -258,7 +260,7 @@ Model = function() {
 		this.popupImage.nJ = nJ;
 	}
 
-	this.setPopupImage = function(data, nI, nJ) {
+	this.setPopupImage = function(data) {
 		this.popupImage.id = data.id;
 		this.popupImage.url = data.images.standard_resolution.url;
 		this.popupImage.width = data.images.standard_resolution.width;
