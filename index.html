@@ -34,7 +34,7 @@
 			</div>
 
 			<div data-role="page" data-theme="b" class="view" id="mapView">
-				<div data-role="header"></div>
+				<div data-role="header" id="mapHeader"></div>
 				<div data-role="main">
 					<button class="ui-btn ui-icon-location ui-btn-icon-left" id="positionButton">Return to Position</button>
 					<div id="mapContainer">
@@ -44,7 +44,7 @@
 					</div>
 				</div>
 
-				<div data-role="footer">
+				<div data-role="footer" id="mapFooter">
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-btn-active ui-state-persist ui-icon-navigation ui-btn-icon-left">Map</a></li>
@@ -57,7 +57,7 @@
 
 
 			<div data-role="page" data-theme="b" class="view" id="chatView">
-				<div data-role="header"></div>
+				<div data-role="header" id="chatHeader"></div>
 				<div data-role="main"> 
 					<div id="chatWindow">
 						<div class ='ui-grid-a' id='messageGrid' style="overflow: scroll;"></div>
@@ -74,7 +74,7 @@
 					</div>
 				</div>
 				
-				<div data-role="footer">
+				<div data-role="footer" id="chatFooter">
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#mapView" class="ui-btn ui-icon-navigation ui-btn-icon-left">Map</a></li>

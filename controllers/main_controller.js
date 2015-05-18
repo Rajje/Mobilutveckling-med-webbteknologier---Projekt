@@ -8,15 +8,23 @@ MainController = function(model) {
 	this.setContentSize = function() {
 		var activePage = $('.ui-page-active').attr('id');
 		var screenHeight = $(window).height();
-		var screenHeader = $('[data-role="header"]', this).height();
-		var screenFooter = $('[data-role="footer"]', this).height();
+
+		var mapHeader = $('#mapHeader').height();
+		var chatHeader = $('#chatHeader').height();
+
+		var mapFooter = $('#mapFooter').height();
+		var chatFooter = $('#chatFooter').height();
+
+
 		var chatScreenBar = $('#chatBar').height();
 		var theRoom = $('#currentRoom').height();
 		var posButton = $('#positionButton').height();
-		var mapContentHeight = screenHeight - screenHeader - screenFooter - posButton - 2;
-		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - theRoom - 2;
+		var mapContentHeight = screenHeight - mapHeader - mapFooter - posButton - 2;
+		var chatContentHeight = screenHeight - chatHeader - chatFooter - chatScreenBar - theRoom - 2;
 		$('#map').height(mapContentHeight + "px");
 		$('#messageGrid').height(chatContentHeight + "px");
+
+
 	}
 
 	this.addSearchHeader = function(view) {
