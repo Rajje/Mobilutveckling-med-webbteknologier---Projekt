@@ -17,6 +17,7 @@ MapController = function(model, mainController, view) {
 			model.loadNearbyMedia(model.userLocation);
 		} else if (msg === "gotNearbyMedia") {
 			this.populateNearbyMedia();
+			this.displayResultCount();
 		} else if (msg === "nearbyMediaCleared") {
 			for (var i in this.mapOverlays) this.mapOverlays[i].close();
 			this.mapOverlays = [];
@@ -67,13 +68,20 @@ MapController = function(model, mainController, view) {
 		}
 	}
 
+	this.displayResultCount = function() {
+		var resultCount = model.numberOfNearbyMedia();
+		var resultCountString = (resultCount == 1) ? (resultCount + " image found") : (resultCount + " images found");
+
+		view.find('#searchResults').html(resultCountString);
+	}
+
 	$(document).on("pageshow", view, function() {
 		// Infogar en Google-karta i elementet med id "map"
 		_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 		model.locateUser();
 	});
 
-	$("#searchForm").submit(function(event) {
+	view.find('#searchForm').submit(function(event) {
 		model.clearNearbyMedia();
 		model.loadNearbyMedia(_this.map.getCenter(), event.target.category.value, event.target.searchInput.value);
 

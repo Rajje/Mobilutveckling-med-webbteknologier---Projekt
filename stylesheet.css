@@ -63,3 +63,9 @@ body {
 #searchButton {
 	float: right;
 }
+
+#searchResults {
+	margin-left: 7px;
+	font-size: 10pt;
+	font-weight: normal;
+}
