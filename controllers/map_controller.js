@@ -32,18 +32,25 @@ MapController = function(model, mainController, view) {
 				var latitude = media.data[i].location.latitude;
 				var longitude = media.data[i].location.longitude;
 				var position = new google.maps.LatLng(latitude, longitude);
+				var mediaID = media.data[i].id;
+
 				var content = document.createElement('div');
 				content.class = "imageOverlay";
 				content.style.width = "50px";
 				content.style.height = "50px";
+
+				// var link = document.createElement('a');
+				// link.href = "#popupImage";
+				// link.setAttribute("data-rel", "popup");
 
 				var img = document.createElement('img');
 				img.src = image;
 				img.class = "imageOverlayImage";
 				img.style.width = "100%";
 				img.style.height = "100%";
+				img.setAttribute("id", mediaID);
+				//link.appendChild(img);
 				content.appendChild(img);
-
 
 				var mapOverlay = (new google.maps.InfoWindow({
 					"content": content,
@@ -51,15 +58,19 @@ MapController = function(model, mainController, view) {
 					"disableAutoPan": true
 				}));
 
-				content.addEventListener("click", function() {
-					alert("click");
+				$(content).click(function(event) {
+					model.loadImage($(event.target).attr("id"));
 				});
+
+				// content.addEventListener("click", function() {
+				// 	alert("click");
+				// });
 
 				mapOverlay.open(this.map);
 
-				google.maps.event.addDomListener(mapOverlay, "click", function() {
-					console.log("klickade");
-				});
+				// google.maps.event.addDomListener(mapOverlay, "click", function() {
+				// 	console.log("klickade");
+				// });
 
 				this.mapOverlays.push(mapOverlay);
 			}
