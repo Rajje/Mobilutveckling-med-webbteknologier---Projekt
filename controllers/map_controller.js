@@ -38,11 +38,14 @@
 				var longitude = media.data[i].location.longitude;
 				var position = new google.maps.LatLng(latitude, longitude);
 				var mediaID = media.data[i].id;
+				var nI = model.nearbyMedia.length - 1;
+				var nJ = i;
 
 				var content = document.createElement('div');
 				content.class = "imageOverlay";
 				content.style.width = "50px";
 				content.style.height = "50px";
+				content.style.overflow = "none";
 
 				// var link = document.createElement('a');
 				// link.href = "#popupImage";
@@ -54,6 +57,8 @@
 				img.style.width = "100%";
 				img.style.height = "100%";
 				img.setAttribute("id", mediaID);
+				img.setAttribute("nI", nI);
+				img.setAttribute("nJ", nJ);
 				//link.appendChild(img);
 				content.appendChild(img);
 
@@ -64,7 +69,8 @@
 				}));
 
 				$(content).click(function(event) {
-					model.loadImage($(event.target).attr("id"));
+					console.log($(event.target).attr("nI") + " " + $(event.target).attr("nJ"));
+					model.loadImage($(event.target).attr("id"), $(event.target).attr("nI"), $(event.target).attr("nJ"));
 				});
 
 				// content.addEventListener("click", function() {
