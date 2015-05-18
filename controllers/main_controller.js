@@ -15,7 +15,7 @@ MainController = function(model) {
 	}
 
 	this.addSearchHeader = function(view) {
-		var header = '<form id="searchForm">\
+		var header = '<form class="searchForm">\
 				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>\
 				<div id="searchResults"></div>\
 				<div class="ui-grid-a">\
@@ -41,7 +41,17 @@ MainController = function(model) {
 		mainController.chatController = new ChatController(model, mainController, $('#chatView'));
 		mainController.popupController = new PopUpController(model, mainController, $('#popUpView'));
 		mainController.setContentSize();
+		
+		$(".searchForm").submit(function(event) {
+			console.log("clicked search");
+			model.updateChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
+			model.clearNearbyMedia();
+			mainController.mapController.displaySearching();
+			model.loadNearbyMedia(mainController.mapController.map.getCenter(), event.target.category.value, event.target.searchInput.value);
+			return false;
+		});
+		
 	});
-
+	
 	window.addEventListener("resize", this.setContentSize);
 }

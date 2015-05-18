@@ -89,13 +89,5 @@
 		}
 	});
 
-	view.find('#searchForm').submit(function(event) {
-		model.updateChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
-		model.clearNearbyMedia();
-		_this.displaySearching();
-		model.loadNearbyMedia(_this.map.getCenter(), event.target.category.value, event.target.searchInput.value);
-		return false;
-	});
-
 	model.subscribe(this);
 }
