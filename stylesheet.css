@@ -12,6 +12,10 @@ body {
 	padding: 0;
 }
 
+#messageGrid {
+	overflow-y: auto;
+}
+
 [data-role=page] {
 	height: 100% !important; 
 	width: 100%;

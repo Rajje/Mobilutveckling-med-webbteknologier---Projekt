@@ -1,4 +1,4 @@
-MapController = function(model, mainController, view) {
+﻿MapController = function(model, mainController, view) {
 	var _this = this;
 
 	this.mapOverlays = [];
@@ -82,9 +82,9 @@ MapController = function(model, mainController, view) {
 	});
 
 	view.find('#searchForm').submit(function(event) {
+		model.setChatChannel(model.userLocation, event.target.category.value, event.target.searchInput.value);
 		model.clearNearbyMedia();
 		model.loadNearbyMedia(_this.map.getCenter(), event.target.category.value, event.target.searchInput.value);
-
 		return false;
 	});
 

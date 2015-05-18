@@ -155,6 +155,15 @@ Model = function() {
 
 		return filteredData;
 	}
+	
+	this.setChatChannel = function(data, category, searchString) {
+		
+	}
+	
+	this.geoHash = function(coord, resolution) {
+		var rez = Math.pow( 10, resolution || 0);
+		return Math.floor(coord * rez) / rez;
+	}
 
 	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {
 		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
@@ -271,7 +280,8 @@ Model = function() {
 	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(){
 		if(this.currentFilter == ""){
-				this.currentFilter = "59.34045571 18.03018451"; 	//REMOVE LATER 
+				//console.log(model.Location);
+				this.currentFilter = "123";
 		}
 		this.chatChannel.subscribe({
 		      channel: this.currentFilter,
