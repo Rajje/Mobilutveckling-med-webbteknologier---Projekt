@@ -166,14 +166,14 @@ Model = function() {
 	this.setChannel = function(location, category, searchString) {
 		this.leaveChat();
 
-		var position = location.A+ " "+ location.F;
+		var position = location[0] + " " + location[1];
 
 		if(this.currentChannel != ""){
 			this.leaveChat();
 		}
 		
 		if((category == "hashtags") && (searchString != "")){
-				this.currentChannel = position + " #"+searchString;
+				this.currentChannel = position + " #" + searchString;
 				model.notifyObservers("newChannel");
 		}
 		else{
@@ -186,8 +186,9 @@ Model = function() {
 		if (resolution == RESOLUTIONS["world"]) {
 			var hashed = 0;
 		} else {
-			var rez = Math.pow( 10, resolution || 0);
-			var hashed = Math.floor(coord * rez) / rez;
+			// var rez = Math.pow( 10, resolution || 0);
+			// var hashed = Math.floor(coord * rez) / rez;
+			var hashed = coord.toFixed(resolution);
 		}
 
 		return hashed;
@@ -216,7 +217,7 @@ Model = function() {
 	}
 
 	this.locationIsDifferent = function(roundedLocation) {
-		if (model.roundedLocation) return ((roundedLocation.A != model.roundedLocation.A) || (roundedLocation.F != model.roundedLocation.F));
+		if (model.roundedLocation) return ((roundedLocation[0] != model.roundedLocation[0]) || (roundedLocation[1] != model.roundedLocation[1]));
 		else return true;
 	}
 
