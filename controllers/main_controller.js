@@ -6,12 +6,19 @@ MainController = function(model) {
 	}
 
 	this.setContentSize = function() {
+		var activePage = $('.ui-page-active').attr('id');
 		var screenHeight = $(window).height();
-		var screenHeader = $('[data-role="header"]').height();
-		var screenFooter = $('[data-role="footer"]').height();
-		var contentHeight = screenHeight - screenHeader - screenFooter;
-		console.log("Header = " + screenHeader + " ContentHeight = " + contentHeight + " Footer = " + screenFooter);
-		$('#map').height(contentHeight + "px");
+		var screenHeader = $('[data-role="header"]', this).height();
+		var screenFooter = $('[data-role="footer"]', this).height();
+		var chatScreenBar = $('#chatBar').height();
+		var mapContentHeight = screenHeight - screenHeader - screenFooter - 2;
+		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - 2;
+		$('#map').height(mapContentHeight + "px");
+		$('#messageGrid').height(chatContentHeight + "px");
+
+
+		
+
 	}
 
 	this.addSearchHeader = function(view) {
@@ -32,6 +39,7 @@ MainController = function(model) {
 			</form>';
 
 		view.append(header);
+
 	}
 
 	$(document).ready(function() {
@@ -40,8 +48,10 @@ MainController = function(model) {
 		mainController.mapController = new MapController(model, mainController, $('#mapView'));
 		mainController.chatController = new ChatController(model, mainController, $('#chatView'));
 		mainController.popupController = new PopUpController(model, mainController, $('#popUpView'));
-		mainController.setContentSize();
 	});
+
+	$(document).on("pageshow","#mapView", this.setContentSize);
+	$(document).on("pageshow","#chatView", this.setContentSize);
 
 	window.addEventListener("resize", this.setContentSize);
 }
