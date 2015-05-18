@@ -9,7 +9,7 @@ Model = function() {
 
 	//For chat
 	this.user = "";
-	this.currentFilter = "";
+	this.currentChannel = "";
 	this.newMessage;
 	this.chatChannel;
 	this.color;
@@ -156,6 +156,15 @@ Model = function() {
 		return filteredData;
 	}
 	
+	this.setChannel = function(data) {
+		var resolution = 2;
+		var lat = data.A;
+		var lang = data.F;
+		this.currentChannel = this.geoHash(lat, 2)+ " "+ this.geoHash(lang,2);
+		console.log(this.currentChannel);
+		this.subscribeToChat();
+	}
+	
 	this.setChatChannel = function(data, category, searchString) {
 		
 	}
@@ -281,12 +290,12 @@ Model = function() {
 	
 	//Function that subscribes to a specific chat channel
 	this.subscribeToChat = function(){
-		if(this.currentFilter == ""){
+		if(this.currentChannel == ""){
 				//console.log(model.Location);
-				this.currentFilter = "123";
+				this.currentChannel = "123";
 		}
 		this.chatChannel.subscribe({
-		      channel: this.currentFilter,
+		      channel: this.currentChannel,
 		      message: function(m){
 					model.newMessage = m;
 					model.notifyObservers("newMessage");
@@ -300,13 +309,13 @@ Model = function() {
 	
 	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
-		this.chatChannel.publish({channel: this.currentFilter, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
 	}
 	
 	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
 		PUBNUB.unsubscribe({
-			channel: this.currentFilter,
+			channel: this.currentChannel,
 		});
 	}
 

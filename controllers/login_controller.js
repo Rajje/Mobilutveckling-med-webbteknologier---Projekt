@@ -8,7 +8,6 @@ LoginController = function(model, mainController, view) {
 			model.getUserInfo();
 			model.initChat();
 			model.subscribeToChat();
-			
 			window.location.href = "#mapView";
 		}
 	}
