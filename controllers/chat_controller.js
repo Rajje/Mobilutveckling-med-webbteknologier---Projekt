@@ -9,13 +9,6 @@ ChatController = function(model, mainController, view) {
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
 		if (msg == "newMessage") this.printMessages();
-		if (msg == "newChannel"){
-			$("#messageGrid").html('');
-			$("#currentRoom").empty();
-			$("#currentRoom").append("<p>"+model.currentChannel+"</p>");
-			model.subscribeToChat();
-			model.getChatHistory();
-		}
 	}
 	
 	this.styleMessage = function(message){

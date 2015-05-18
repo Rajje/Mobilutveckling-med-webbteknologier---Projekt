@@ -11,25 +11,42 @@ MainController = function(model) {
 		var screenHeader = $('[data-role="header"]', this).height();
 		var screenFooter = $('[data-role="footer"]', this).height();
 		var chatScreenBar = $('#chatBar').height();
-		var currentRoom = $('#currentRoom').height();
+		var theRoom = $('#currentRoom').height();
+
+		console.log("height" + screenHeight);
+		console.log("room" + theRoom);
+		console.log("bar" + chatScreenBar);
+		console.log("header" + screenHeader);
+		console.log("footer" + screenFooter);
+
 		var mapContentHeight = screenHeight - screenHeader - screenFooter - 2;
-		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - 2 - currentRoom;
+		var chatContentHeight = screenHeight - screenHeader - screenFooter - chatScreenBar - theRoom - 2;
 		$('#map').height(mapContentHeight + "px");
 		$('#messageGrid').height(chatContentHeight + "px");
 	}
+
+
+
+
+
+
+
+
+
 
 	this.addSearchHeader = function(view) {
 		var header = '<form class="searchForm">\
 				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search"></input>\
 				<div id="searchResults"></div>\
-				<div class="ui-grid-a">\
+				<div class="ui-grid-b">\
 					<div class="ui-block-a">\
 						<select name="category" data-mini="true" data-inline="true">\
 							<option value="hashtags">Hashtags</option>\
 							<option value="users">User</option>\
 						</select>\
 					</div>\
-					<div class="ui-block-b">\
+					<div class="ui-block-c"><p style="text-align:center; font-size:50%;" class ="currentRoom"></p></div>\
+					<div class="ui-block-c">\
 						<button class="ui-btn ui-mini ui-btn-inline ui-corner-all" type="submit" id="searchButton">Search</button>\
 					</div>\
 				</div>\
@@ -55,7 +72,22 @@ MainController = function(model) {
 		});
 	});
 
+	this.update = function(msg) {
+		if (msg == "newChannel"){
+			$("#messageGrid").html('');
+			$(".currentRoom").empty();
+			console.log("hej");
+			$(".currentRoom").append("<p>"+model.currentChannel+"</p>");
+			mainController.setContentSize();
+			model.subscribeToChat();
+			model.getChatHistory();
+		}
+
+
+	}
+
 		$(document).on("pageshow","#mapView", this.setContentSize);
 		$(document).on("pageshow","#chatView", this.setContentSize);
-		window.addEventListener("resize", this.setContentSize);		
+		window.addEventListener("resize", this.setContentSize);	
+		model.subscribe(this);	
 	}
