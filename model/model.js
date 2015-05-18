@@ -1,4 +1,4 @@
-Model = function() {
+﻿Model = function() {
 	this.observers = [];
 	this.accessToken = "";
 	this.loggedIn = false;
@@ -6,6 +6,8 @@ Model = function() {
 	this.nearbyMedia = [];
 	this.locationIDs = null;
 	this.nearbyMedia = [];
+	this.roundedLocation = null;
+	this.currentTag = "";
 	this.popupImage = {};
 
 	//For chat
@@ -36,6 +38,7 @@ Model = function() {
 		this.notifyObservers("foundLocation");
 		console.log("foundLocation");
 		this.setChannel(this.userLocation, "", ""); // ska kompletteras med hur funktionen faktiskt ska anropas
+
 	}
 
 	this.noLocation = function(message) {
@@ -104,7 +107,7 @@ Model = function() {
 			function(data) {
 				model.locationIDs = data;
 				model.notifyObservers("gotLocationIDs");
-				model.loadNearbyMedia();
+				model.loadNearbyMedia(position);
 			}
 		);
 	}
@@ -155,11 +158,16 @@ Model = function() {
 					filteredData.data.push(data.data[i]);
 				}
 			}
+		} else if (category == "locationExistence") {
+			for (var i in data.data) {
+				if (data.data[i].location) filteredData.data.push(data.data[i]);
+			}
 		}
 
 		return filteredData;
 	}
 	
+<<<<<<< HEAD
 	this.setChannel = function(data, category, searchString) {
 		if(this.currentChannel == "123" && this.loading == true){
 			model.notifyObservers("newChannel");
@@ -190,47 +198,152 @@ Model = function() {
 	}
 	
 	this.geoHash = function(coord, resolution) {
-		var rez = Math.pow( 10, resolution || 0);
-		return Math.floor(coord * rez) / rez;
+		if (resolution == RESOLUTIONS["world"]) {
+			var hashed = 0;
+		} else {
+			// var rez = Math.pow( 10, resolution || 0);
+			// var hashed = Math.floor(coord * rez) / rez;
+			var hashed = coord.toFixed(resolution);
+		}
+
+		return hashed;
 	}
 
-	this.loadImage = function(mediaID) {
-		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
-			function(data) {
-				model.popupImage.url = data.data.images.standard_resolution.url;
-				model.popupImage.width = data.data.images.standard_resolution.width;
-				model.popupImage.height = data.data.images.standard_resolution.height;
-				model.notifyObservers("loadImage");
+	this.determineResolution = function(zoom) {
+		// Recieves a google map zoom integer. Returns the geohash resolution to be used with that zoom. 
+		var resolution = 0;
+
+		if (zoom >= 15) resolution = RESOLUTIONS["local"];
+		else if (zoom >= 12 && zoom < 15) resolution = RESOLUTIONS["district"];
+		else if (zoom < 12) resolution = RESOLUTIONS["world"];
+
+		return resolution;
+	}
+
+	this.determineDistance = function(zoom) {
+		// Recieves a google map zoom integer. Returns the distance whithin which to search for images.
+		var distance = 0;
+
+		if (zoom >= 15) distance = DISTANCES["local"];
+		else if (zoom >= 12 && zoom < 15) distance = DISTANCES["district"];
+		else if (zoom < 12) distance = DISTANCES["world"];
+
+		return distance;
+	}
+
+	this.locationIsDifferent = function(roundedLocation) {
+		if (model.roundedLocation) return ((roundedLocation[0] != model.roundedLocation[0]) || (roundedLocation[1] != model.roundedLocation[1]));
+		else return true;
+	}
+
+	this.mediaCallback = function(data, position, distance, category, searchString, maxTimestamp, count) {
+		if (data.data.length > 0) {
+			var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
+			if (distance == "WORLD") data = model.filterMedia(data, "locationExistence");
+			if (searchString) data = model.filterMedia(data, category, searchString);
+		}
+
+		if (data.data.length > 0) {
+			model.nearbyMedia.push(data); // spara bunten med hittade bilder
+			model.notifyObservers("gotNearbyMedia");
+		}
+
+		count += 1;
+
+		if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
+			model.loadNearbyMedia(position, distance, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+		} else {
+			model.notifyObservers("loadNearbyMedia_done");
+		}
+	}
+
+	this.loadImage = function(mediaID, nI, nJ) {
+		console.log(nI + " "+  nJ);
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("loadImage");
+		// this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
+		// 	function(data, nI, nJ) {
+		// 		model.setPopupImage(data.data);
+		// 		model.notifyObservers("loadImage");
+		// 	}
+		// );
+	}
+
+	this.setPopupImagePosition = function(nI, nJ) {
+		this.popupImage.nI = nI;
+		this.popupImage.nJ = nJ;
+	}
+
+	this.setPopupImage = function(data) {
+		this.popupImage.id = data.id;
+		this.popupImage.url = data.images.standard_resolution.url;
+		this.popupImage.width = data.images.standard_resolution.width;
+		this.popupImage.height = data.images.standard_resolution.height;
+		this.popupImage.caption = data.caption;
+		this.popupImage.comments = data.comments;
+	}
+
+	this.getNextPopupImage = function() {
+		var nI = parseInt(this.popupImage.nI);
+		var nJ = parseInt(this.popupImage.nJ) + 1;
+		if (nJ >= this.nearbyMedia[nI].data.length) {
+			nJ = 0;
+			if (nI >= this.nearbyMedia.length - 1) {
+				nI = 0;
+			} else {
+				nI += 1;
 			}
-		);
+		}
+		console.log(nI + " "+  nJ);
+
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("nextPopupImage");
 	}
 
-	this.loadNearbyMedia = function(position, category, searchString, maxTimestamp, count) {
+	this.getPreviousPopupImage = function() {
+		//hitta bilden som nu visas i listan med all media
+		var nI = parseInt(this.popupImage.nI);
+		var nJ = parseInt(this.popupImage.nJ) - 1;
+
+		if (nJ < 0) {
+			if (nI <= 0) {
+				nI = this.nearbyMedia.length - 1;
+			} else {
+				nI -= 1;
+			}
+			nJ = this.nearbyMedia[nI].data.length - 1;
+		}
+		console.log(nI + " "+  nJ);
+
+		this.setPopupImagePosition(nI, nJ);
+		this.setPopupImage(this.nearbyMedia[nI].data[nJ]);
+		this.notifyObservers("nextPopupImage");
+		
+	}
+
+	this.loadNearbyMedia = function(position, distance, category, searchString, maxTimestamp, count) {
 		// Hämtar bilder från Instagram tagna på angiven position och sparar dem i modellen
-		var latitude = position.A;
-		var longitude = position.F;
-		var distance = 500;
+		
 		var count = count ? count : 0;
 
-		this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
-			function(data) {
-				var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
-
-				if ((data.data.length > 0) && searchString) data = model.filterMedia(data, category, searchString);
-				if (data.data.length > 0) {
-					model.nearbyMedia.push(data); // spara bunten med hittade bilder
-					model.notifyObservers("gotNearbyMedia");
+		if (distance == "WORLD") {
+			this.getHttp("https://api.instagram.com/v1/media/popular?max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken, 
+				function(data) {
+					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count);
 				}
+			);
+		} else {
+			var latitude = position.A;
+			var longitude = position.F;
 
-				count += 1;
-
-				if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
-					model.loadNearbyMedia(position, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
-				} else {
-					model.notifyObservers("loadNearbyMedia_done");
+			this.getHttp("https://api.instagram.com/v1/media/search?lat=" + latitude + "&lng=" + longitude + "&distance=" + distance + "&max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken,
+				function(data) {
+					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count)
 				}
-			}
-		);
+			);
+		}		
 	}
 
 	this.clearNearbyMedia = function() {
