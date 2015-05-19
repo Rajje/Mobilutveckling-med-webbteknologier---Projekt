@@ -11,7 +11,14 @@ ChatController = function(model, mainController, view) {
 	}
 	
 	this.styleMessage = function(message){
-		var name = "<div class ='userInfo'><a href='#popUpView' data-rel='popup' data-transition='pop'><p class='ui-block-a' style = 'width: 30%; !important; color:"+message.textColor+"'>"+message.alias+"</p></a></div>";
+		console.log("style message");
+		var name = "<div class ='userInfo'>\
+						<a href='#popUpView' data-rel='popup' data-transition='pop'>\
+							<p class='ui-block-a' style = 'width: 30%; !important; color:"+message.textColor+"'>"
+								+message.alias+
+							"</p>\
+						</a>\
+					</div>";
 		var msg = "<small class='ui-block-b' >"+message.chatMsg+"</small>";
 		return name+msg;
 	}
