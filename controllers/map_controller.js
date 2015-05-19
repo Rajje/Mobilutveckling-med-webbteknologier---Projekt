@@ -11,14 +11,14 @@
 	this.update = function(msg) {
 		if (msg === "test")	view.append("<p>test update</p>");
 
-		if (msg === "foundLocation") {
-			this.map.setCenter(model.userLocation);
-			this.setNewPosition();
-		} else if (msg === "gotNearbyMedia") {
-			this.populateNearbyMedia();
+		if (msg === "foundLocation") { // när användarens position hittas
+			this.map.setCenter(model.userLocation); // centrera kartan där
+			this.setNewPosition(); // hitta media och sätt kanal grundat på var kartan just sattes
+		} else if (msg === "gotNearbyMedia") { // varje gång en bunt med media har lagts till i modellen. 
+			this.populateNearbyMedia(); // lägg in mediat i kartan
 			this.displayResultCount();
 		} else if (msg === "nearbyMediaCleared") {
-			for (var i in this.mapOverlays) this.mapOverlays[i].close();
+			for (var i in this.mapOverlays) this.mapOverlays[i].close(); // ta bort alla bilder ur kartan
 			this.mapOverlays = [];
 		} else if (msg === "loadNearbyMedia_done") {
 			this.displayResultCount();
@@ -28,6 +28,7 @@
 	// this.imageContainerLeft = 40;
 
 	this.populateNearbyMedia = function() {
+		// Lägger in den senaste tillagda bunten media i kartan
 		var media = model.getLatestNearbyMedia();
 		if (media.data.length > 0) {
 			for (var i in media.data) {
@@ -67,8 +68,9 @@
 				}));
 
 				$(content).click(function(event) {
+					// Vid klick på bilden
 					console.log($(event.target).attr("nI") + " " + $(event.target).attr("nJ"));
-					model.loadImage($(event.target).attr("id"), $(event.target).attr("nI"), $(event.target).attr("nJ"));
+					model.loadImage($(event.target).attr("id"), $(event.target).attr("nI"), $(event.target).attr("nJ")); // ladda ner hela bilden till modellen. Modellen kommer att notifiera popup controller att en bild finns att visa. 
 				});
 
 				// content.addEventListener("click", function() {
@@ -91,6 +93,7 @@
 	}
 
 	this.displayResultCount = function() {
+		// Visar sökresultaten under sökrutan
 		var resultCount = model.numberOfNearbyMedia();
 		var resultCountString = (resultCount == 1) ? (resultCount + " image found") : (resultCount + " images found");
 
@@ -98,6 +101,7 @@
 	}
 
 	this.setNewPosition = function() {
+		// Kör allt som behöver köras när användaren har valt en ny position
 		var location = this.map.getCenter();
 		var zoom = this.map.getZoom();
 		var resolution = model.determineResolution(zoom);
@@ -115,11 +119,11 @@
 			model.clearNearbyMedia();
 			this.displaySearching();
 			
-			if (model.curentTag !== "") {
+			if (model.curentTag !== "") { // om en tag är vald, gå in i kanalen med tagens namn och visa bara bilder med den tagen
 				var category = "hashtags";
 				model.setChannel(roundedLocation, category, model.currentTag);
 				model.loadNearbyMedia(location, distance, category, model.currentTag);
-			} else {
+			} else { 
 				model.setChannel(roundedLocation);
 				model.loadNearbyMedia(location, distance);
 			}
@@ -131,10 +135,10 @@
 		if (!_this.map) { // om inte kartan finns sedan tidigare
 			_this.map = model.getMap(STANDARD_LONG, STANDARD_LAT, STANDARD_ZOOM, document.getElementById('map')); // Skapa ny karta positionnerad på standardplatsen
 			model.locateUser();
-			google.maps.event.addListener(_this.map, "dragend", function() {
+			google.maps.event.addListener(_this.map, "dragend", function() { // lyssnar efter när kartan panoreras, uppdaterar positionen
 				_this.setNewPosition();
 			});
-			google.maps.event.addListener(_this.map, "zoom_changed", function() {
+			google.maps.event.addListener(_this.map, "zoom_changed", function() { // lissnar efter när kartan zoomas, uppdaterar positionen
 				_this.setNewPosition();
 			});
 		}

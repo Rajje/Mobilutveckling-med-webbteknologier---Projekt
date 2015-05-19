@@ -17,9 +17,8 @@
 	this.chatChannel;
 	this.color;
 	this.loading = true;
-	var _this = this;
 	
-	var model = this;
+	var model = this; 
 
 	this.test = function() {
 		console.log("test");
@@ -64,7 +63,8 @@
 	}
 
 	this.cameFromInstagramLogin = function() {
-		if (window.location.hash === "") {
+		// Svarar True om det finns någon access token angiven efter # i URL
+		if (window.location.hash === "") { 
 			return false;
 		} else {
 			return true;
@@ -72,6 +72,8 @@
 	}
 
 	this.getAccessTokenFromUrl = function() {
+		// Hämtar access token från URL när Instagram-inloggningen skickar den. 
+		// Sparar token och meddelar observerare att den finns. 
 		console.log(window.location.hash.substring(1, 13));
 		if(window.location.hash.substring(1, 13) === "access_token") {
 			this.accessToken = window.location.hash;
@@ -83,6 +85,7 @@
 	}
 
 	this.getHttp = function(url, successFunction) {
+		// Generell funktion för asynkrona http-begäran
 		$.ajax({
 			'type': 'GET',
 			'dataType': 'jsonp',
@@ -102,6 +105,8 @@
 	}
 
 	this.loadLocationIDs = function(position, distance) {
+		// Laddar location IDs till namngivna platser från Instagram som finns i närheten av angiven position.
+		// Används för närvarande inte. 
 		var latitude = position.A;
 		var longitude = position.F;
 		if (!distance) var distance = 1000;
@@ -115,6 +120,8 @@
 	}
 
 	this.loadMediaFromLocations = function() {
+		// Laddar bilder från de location IDs som hittats i funktionen loadLocationIDs. 
+		// Används för närvarande inte. 
 		console.log(this.locationIDs.data.length);
 		for (var i = 0; i < this.locationIDs.data.length; i++) {
 			var locationID = this.locationIDs.data[i].id;
@@ -138,6 +145,7 @@
 	}
 
 	this.filterMedia = function(data, category, searchString) {
+		// Tar emot en bunt media. Gör en tom bunt media och sparar i den bara det media som uppfyller filtret. 
 		var filteredData = {
 			data: [], 
 			meta: data.meta
@@ -170,22 +178,22 @@
 	}
 	
 	this.setChannel = function(data, category, searchString) {
-		if(this.currentChannel == "123" && this.loading == true){
+		// Tar emot en avrundad position, en kategori och en söksträng. Ställer in kanalen.
+		if (this.currentChannel == "123" && this.loading == true) { // i början, innan anvs position hittats, används standardkanalen "123"
 			model.notifyObservers("newChannel");
 			this.loading = false;
 		} else {
-			if (this.currentChannel != "") {
+			if (this.currentChannel != "") { // om en kanal är satt redan, lämna den
 				this.leaveChat();
 				console.log("leaving nr: "+this.currentChannel);
 			}
-		
-			var resolution = 2;
+
 			var lat = data[0];
 			var lang = data[1];
-			var position = lat + " " + lang;
+			var position = lat + " " + lang; // kanalen namnges till anvs valda koordinater, avrundade beroende på upplösning
 			
-			if ((category == "hashtags") && (searchString != "")) {
-				this.currentChannel = position + " #"+searchString;
+			if ((category == "hashtags") && (searchString != "")) { // om en hashtag är vald
+				this.currentChannel = position + " #"+searchString; // gå till kanalen med namn "[lat] [long] #[tag]"
 				model.notifyObservers("newChannel");
 			} else {
 				this.currentChannel = position;
@@ -195,9 +203,10 @@
 	}
 	
 	this.geoHash = function(coord, resolution) {
+		// Avrundar koordinater till angiven decimal
 		console.log(coord);
 
-		if (resolution == RESOLUTIONS["world"]) {
+		if (resolution == RESOLUTIONS["world"]) { // om upplösningen är "world", returneras inte anvs koordinater utan bara 0
 			var hashed = 0;
 		} else {
 			// var rez = Math.pow( 10, resolution || 0);
@@ -236,13 +245,14 @@
 	}
 
 	this.mediaCallback = function(data, position, distance, category, searchString, maxTimestamp, count) {
+		// Anropas när en bunt bilder har mottagits av loadImage
 		if (data.data.length > 0) {
 			var oldestTimestamp = data.data[data.data.length - 1].created_time; // den sista bilden i arrayen har det äldsta datumet
-			if (distance == "WORLD") data = model.filterMedia(data, "locationExistence");
+			if (distance == "WORLD") data = model.filterMedia(data, "locationExistence"); // om sökningen skedde i hela världen i stället för på vissa koordinater, får man tillbaka bilder som inte alltid har koordinater och de måste filtreras bort
 			if (searchString) data = model.filterMedia(data, category, searchString);
 		}
 
-		if (data.data.length > 0) {
+		if (data.data.length > 0) { // om det fortfarande finns några bilder kvar
 			model.nearbyMedia.push(data); // spara bunten med hittade bilder
 			model.notifyObservers("gotNearbyMedia");
 		}
@@ -250,13 +260,14 @@
 		count += 1;
 
 		if ((model.numberOfNearbyMedia() < 20) && (count <= MAX_REQUESTS)) { // om färre än 20 bilder har hittats eller tills 5 sökningar har gjorts
-			model.loadNearbyMedia(position, distance, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet
+			model.loadNearbyMedia(position, distance, category, searchString, oldestTimestamp, count); // kör funktionen igen rekursivt fr.o.m. det äldsta hittade datumet. Instagrams API har inte pagination och inget sätt att söka efter locations och hashtags samtidigt, så detta är det enda sättet. 
 		} else {
 			model.notifyObservers("loadNearbyMedia_done");
 		}
 	}
 
 	this.loadImage = function(mediaID, nI, nJ) {
+		// Hämtar en specifik vald bild. 
 		console.log(nI + " "+  nJ);
 		this.setPopupImagePosition(nI, nJ);
 		this.getHttp("https://api.instagram.com/v1/media/" + mediaID + "?access_token=" + this.accessToken,
@@ -300,7 +311,7 @@
 	}
 
 	this.getPreviousPopupImage = function() {
-		//hitta bilden som nu visas i listan med all media
+		// hitta bilden som nu visas i listan med all media
 		var nI = parseInt(this.popupImage.nI);
 		var nJ = parseInt(this.popupImage.nJ) - 1;
 
@@ -325,13 +336,13 @@
 		
 		var count = count ? count : 0;
 
-		if (distance == "WORLD") {
+		if (distance == "WORLD") { // om anv zoomat ut till hela världen, hämta en generell ström med populäraste bilder
 			this.getHttp("https://api.instagram.com/v1/media/popular?max_timestamp=" + maxTimestamp + "&access_token=" + this.accessToken, 
 				function(data) {
 					model.mediaCallback(data, position, distance, category, searchString, maxTimestamp, count);
 				}
 			);
-		} else {
+		} else { // om en position är vald, hitta bilder på den poisitionen
 			var latitude = position.A;
 			var longitude = position.F;
 
@@ -349,6 +360,7 @@
 	}
 
 	this.getLatestNearbyMedia = function() {
+		// Svarar med den senaste bunten av nedladdade media
 		return this.nearbyMedia[this.nearbyMedia.length - 1];
 	}
 	
@@ -357,10 +369,11 @@
 	}
 
 	this.getUserInfo = function() {
-		this.color = this.randomColorGenerator();
+		// Hämtar anvs information från Instagram och sparar ett lokalt användarobjekt
+		this.color = this.randomColorGenerator(); // sätt anvs färg (används i chatten) till något slumpmässigt
 		this.getHttp("https://api.instagram.com/v1/users/self/?access_token=" + this.accessToken,
 			function(data) {
-					this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name);
+				this.user = new User(data.data.username, data.data.profile_picture, data.data.full_name);
 			});
 	}
 	
@@ -393,7 +406,7 @@
 		this.chatChannel.history({
 			channel: this.currentChannel,
 			count: 10,
-			callback: function(m){_this.sendMessage(m[0])}			
+			callback: function(m){model.sendMessage(m[0])}			
 		});
 	}
 	
@@ -406,13 +419,13 @@
 	}
 	
 	this.getAlias = function() {
-			return user.alias;
+		return user.alias;
 	}
 	
 	this.getNewUser = function(alias) {
-			this.getNewUserInfo(alias).done(function (){
-				model.notifyObservers("loadPopup");
-			});
+		this.getNewUserInfo(alias).done(function() {
+			model.notifyObservers("loadPopup");
+		});
 	}
 	
 	this.randomColorGenerator = function() {
@@ -421,11 +434,12 @@
 		for (var i = 0; i < 6; i++ ) {
 			color += letters[Math.floor(Math.random() * 16)];
 		}
+
 		return color;
 	}
 	
-	//Function that init PUBNUB chat
 	this.initChat = function(){
+		// Kör pubnub-chatfunktionen
 		var randomID = PUBNUB.uuid();
 		this.chatChannel = PUBNUB.init({
 			publish_key: 'pub-c-c9b9bd43-e594-4146-b78a-716088b91de8',
@@ -438,41 +452,50 @@
 		return this.newMessage;
 	}
 	
-	//Function that subscribes to a specific chat channel
-	this.subscribeToChat = function(){
-		console.log("subscribed to "+this.currentChannel);
+	this.subscribeToChat = function() {
+		// Subscribes to a specific chat channel
+		console.log("Subscribed to " + this.currentChannel);
 		
 		this.chatChannel.subscribe({
-		      channel: this.currentChannel,
-		      message: function(m){
-					model.newMessage = m;
-					model.notifyObservers("newMessage");
-			  },
-		      connect: function(){console.log("Connected"); model.getChatHistory(); subscribed = true},
-		      disconnect: function(){console.log("Disconnected")},
-		      reconnect: function(){console.log("Reconnected")},
-		      error: function(){console.log("Network Error")},
+			channel: this.currentChannel,
+			message: function(m) {
+				model.newMessage = m;
+				model.notifyObservers("newMessage");
+			},
+			connect: function() {
+				console.log("Connected"); 
+				model.getChatHistory(); 
+				subscribed = true
+			},
+			disconnect: function() {console.log("Disconnected")},
+			reconnect: function() {console.log("Reconnected")},
+			error: function() {console.log("Network Error")},
 	 	});		
 		
 	}
 	
-	//Function for sending message in chat
 	this.sendMessage = function(chatMsg) {
+		// Sends messages in chat
 		
-		if(typeof chatMsg == 'object'){
-			for(var i = 0; i < chatMsg.length-1; i++){
-				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg[i].chatMsg, chatMsg[i].alias, chatMsg[i].textColor, chatMsg[i].profileImage)});
+		if (typeof chatMsg == 'object') {
+			for (var i = 0; i < chatMsg.length-1; i++) {
+				this.chatChannel.publish({
+					channel: this.currentChannel, 
+					message: new Message(chatMsg[i].chatMsg, chatMsg[i].alias, chatMsg[i].textColor, chatMsg[i].profileImage)
+				});
 			}
-		}
-		else{
-			if(chatMsg != ""){
-				this.chatChannel.publish({channel: this.currentChannel, message : new Message(chatMsg, user.alias, this.color, user.profileImage)});
+		} else {
+			if (chatMsg != "") {
+				this.chatChannel.publish({
+					channel: this.currentChannel, 
+					message: new Message(chatMsg, user.alias, this.color, user.profileImage)
+				});
 			}
 		}
 	}
 	
-	//Function for unsubscribing from a chat channel
 	this.leaveChat = function(){
+		// Unsibscribes from a chat channel
 		this.chatChannel.unsubscribe({
 			channel: this.currentChannel,
 		});

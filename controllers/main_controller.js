@@ -6,6 +6,7 @@ MainController = function(model) {
 	}
 
 	this.setContentSize = function() {
+		// Ändrar storleken på huvudinnehållet beroende på fönstrets storlek
 		var activePage = $('.ui-page-active').attr('id');
 		var screenHeight = $(window).height();
 
@@ -28,6 +29,7 @@ MainController = function(model) {
 	}
 
 	this.addSearchHeader = function(view) {
+		// Sidhuvudet med sökrutan, genererad genom script överst på både map view och chat view. 
 		var header = '<form class="searchForm">\
 				<input name="searchInput" type="search" data-inline="true" data-mini="true" placeholder="Search" class="searchInput"></input>\
 				<div id="searchResults"></div>\
@@ -49,6 +51,8 @@ MainController = function(model) {
 	}
 
 	$(document).ready(function() {
+		// Starta alla controllers i början. 
+		// Det fanns en tanke om att chat och allt alltid skulle vara i gång i bakgrunden och att man skulle få notifieringar, men det hanns inte med. 
 		mainController.addSearchHeader($('[data-role="header"]'));
 		mainController.loginController = new LoginController(model, mainController, $('#loginView'));
 		mainController.mapController = new MapController(model, mainController, $('#mapView'));
@@ -86,7 +90,7 @@ MainController = function(model) {
 
 	}
 
-	$(document).on("pageshow","#mapView", this.setContentSize);
+	$(document).on("pageshow","#mapView", this.setContentSize); // när ny sida visas, beräkna dess storlek
 	$(document).on("pageshow","#chatView", this.setContentSize);
 	window.addEventListener("resize", this.setContentSize);	
 	model.subscribe(this);	
